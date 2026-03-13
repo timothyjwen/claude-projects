@@ -511,6 +511,9 @@ function drawChart(){
 
   let h='';
 
+  // Clip path — nothing renders outside the chart area
+  h+=`<defs><clipPath id="chartClip"><rect x="0" y="${PT}" width="${cW}" height="${cH}"/></clipPath></defs>`;
+
   // Y gridlines
   for(let i=0;i<=6;i++){
     const p=minP+(i/6)*(maxP-minP);
@@ -531,6 +534,7 @@ function drawChart(){
   h+=`<text x="${(cW/2).toFixed(0)}" y="${(PT+cH+28).toFixed(0)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">DISTANCE (KM)</text>`;
   h+=`<text transform="rotate(-90)" x="${-(PT+cH/2).toFixed(0)}" y="-40" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">PACE (MIN/KM)</text>`;
 
+  h+=`<g clip-path="url(#chartClip)">`;
   h+=drawOverlay(wkOvr,xOfIdx,yOf,easyP,cW,cH,PT);
 
   // GAP POLYGON
@@ -568,6 +572,7 @@ function drawChart(){
     h+=`<rect class="hz" data-i="${i}" x="${x1.toFixed(1)}" y="${PT}" width="${(x2-x1).toFixed(1)}" height="${cH}" fill="transparent" style="cursor:crosshair"/>`;
   });
 
+  h+=`</g>`;
   svg.innerHTML=h;svg.setAttribute('height',H);
   svg.querySelectorAll('.hz').forEach(el=>{
     el.addEventListener('mouseenter',e=>showTT(e,+el.dataset.i));
