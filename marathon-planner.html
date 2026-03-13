@@ -375,9 +375,9 @@ function updateGap(){
   if(!fit){b.textContent='—';b.className='gbadge empty';return;}
   const curMP=rFrom(fit.tot,fit.dist,MA);
   const gm=Math.round((curMP-mpSecs)*MA/60);
-  if(gm>0){b.textContent=`${gm} min behind`;b.className='gbadge behind';}
+  if(gm>0){b.textContent=`${gm} min faster`;b.className='gbadge ahead';}
   else if(gm===0){b.textContent='ON TARGET';b.className='gbadge ahead';}
-  else{b.textContent=`${Math.abs(gm)} min faster`;b.className='gbadge ahead';}
+  else{b.textContent=`${Math.abs(gm)} min behind`;b.className='gbadge behind';}
 }
 
 // ─── PACE FUNCTIONS ───────────────────────────
