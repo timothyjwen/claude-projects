@@ -35,16 +35,14 @@ h1 em{color:var(--mp);font-style:normal;}
 .cfi{width:56px;background:var(--surf);border:1px solid var(--bord);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:27px;text-align:center;outline:none;padding:5px 2px;line-height:1;height:46px;}
 .cfi:focus{border-color:var(--easy);color:var(--easy);}
 .csep{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);padding-bottom:10px;}
-/* current pace min/km badge */
 .cur-pace-box{display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:var(--surf);border:1px solid var(--easy);height:46px;padding:0 14px;min-width:80px;}
 .cpb-pace{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--easy);line-height:1;}
 .cpb-unit{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
-/* gap badge */
 .gbadge{font-family:'DM Mono',monospace;font-size:9px;padding:0 12px;letter-spacing:1px;white-space:nowrap;height:46px;display:flex;align-items:center;border:1px solid var(--bord);}
 .gbadge.behind{background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.25);}
-.gbadge.ahead{background:rgba(59,130,246,.1);color:#3b82f6;border-color:rgba(59,130,246,.25);}
-.gbadge.ontrack{background:rgba(34,197,94,.1);color:#22c55e;border-color:rgba(34,197,94,.25);}
+.gbadge.ahead{background:rgba(34,197,94,.1);color:#22c55e;border-color:rgba(34,197,94,.25);}
+.gbadge.closing{background:rgba(249,115,22,.1);color:#f97316;border-color:rgba(249,115,22,.25);}
 .gbadge.empty{color:var(--muted);}
 
 /* CONTROLS */
@@ -66,11 +64,16 @@ h1 em{color:var(--mp);font-style:normal;}
 input[type=range]{-webkit-appearance:none;height:2px;background:var(--bord);outline:none;cursor:pointer;width:80px;}
 input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:var(--mp);cursor:pointer;border-radius:50%;}
 
+/* current pace sub-display inside marathon pace ctrl */
+.cur-mp-sub{margin-top:8px;border-top:1px solid var(--bord);padding-top:6px;display:none;}
+.cur-mp-label{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:1.5px;display:block;margin-bottom:2px;}
+.cur-mp-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--easy);line-height:1;}
+
 /* CHART */
-.chart-section{padding:18px 32px 0;position:relative;z-index:1;}
+.chart-section{padding:18px 32px 0;position:relative;z-index:1;overflow-x:auto;}
 .chart-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:1px;}
 .chart-sub{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1px;margin-bottom:10px;}
-.wk-strip{background:var(--surf2);border:1px solid var(--bord);border-bottom:none;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.wk-strip{background:var(--surf2);border:1px solid var(--bord);border-bottom:none;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;min-width:900px;}
 .wsl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:2px;color:var(--muted);white-space:nowrap;text-transform:uppercase;}
 .wsr{display:flex;align-items:center;gap:8px;flex:1;min-width:180px;}
 #wkOvr{width:100%;max-width:280px;margin:0;}
@@ -81,10 +84,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
 .wtag.wi{color:var(--int);border:1px solid rgba(250,204,21,.2);background:rgba(250,204,21,.05);}
 .wtag.wt{color:var(--tempo);border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.05);}
 .wtag.wl{color:var(--long);border:1px solid rgba(52,211,153,.2);background:rgba(52,211,153,.05);}
-.cleg-bar{background:var(--surf);border:1px solid var(--bord);border-bottom:none;padding:7px 14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.cleg-bar{background:var(--surf);border:1px solid var(--bord);border-bottom:none;padding:7px 14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;min-width:900px;}
 .cleg{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1px;white-space:nowrap;}
 .cl{width:22px;height:2px;}
-.chart-outer{background:var(--surf);border:1px solid var(--bord);padding:16px 10px 56px 54px;position:relative;overflow:hidden;}
+.chart-outer{background:var(--surf);border:1px solid var(--bord);padding:16px 10px 56px 54px;position:relative;overflow:hidden;min-width:900px;}
 #cSvg{display:block;width:100%;overflow:visible;}
 .ctt{position:absolute;background:#1c1c28;border:1px solid #2a2a3c;font-family:'DM Mono',monospace;font-size:10px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:30;line-height:1.8;}
 .ttd{font-size:7.5px;color:var(--muted);letter-spacing:1px;}
@@ -107,7 +110,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
 .wcontent{display:flex;flex-direction:column;gap:4px;padding:3px 0;}
 .run-bars{display:flex;flex-direction:column;gap:2px;}
 .rrow{display:flex;align-items:center;gap:7px;}
-.rtype{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:54px;flex-shrink:0;text-transform:uppercase;}
+.rtype{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:70px;flex-shrink:0;text-transform:uppercase;}
 .bwrap{flex:1;height:8px;display:flex;align-items:center;}
 .segs{display:flex;height:100%;gap:1px;}
 .seg{height:100%;flex-shrink:0;border-radius:1px;min-width:2px;}
@@ -116,7 +119,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;heigh
 .seg.marathon{background:var(--mp);}
 .rdist{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);width:34px;text-align:right;flex-shrink:0;}
 .conv-row{display:flex;align-items:center;gap:7px;}
-.cv-lbl{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:54px;flex-shrink:0;text-transform:uppercase;}
+.cv-lbl{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:70px;flex-shrink:0;text-transform:uppercase;}
 .cv-out{flex:1;position:relative;}
 .cv-track{width:100%;height:3px;background:var(--bord);border-radius:2px;position:relative;}
 .cv-fill{height:100%;border-radius:2px;position:absolute;left:0;top:0;}
@@ -178,7 +181,6 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
       <span class="csep">:</span>
       <div class="cfw"><div class="cfl">SEC</div><input class="cfi" id="fS" type="number" min="0" max="59" value="0" oninput="renderAll()"></div>
     </div>
-    <!-- Current min/km badge -->
     <div class="cur-pace-box" id="curPaceBox">
       <div class="cpb-pace" id="curPaceVal">—</div>
       <div class="cpb-unit">MIN / KM</div>
@@ -187,20 +189,27 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
   </div>
 </div>
 
-<!-- ② TARGET CONTROLS -->
+<!-- ② TARGET CONTROLS — Time first, Pace second -->
 <div class="controls">
   <div class="ctrl">
-    <div class="clbl">Target Marathon Pace</div>
-    <div class="prow">
-      <div><div class="pnum c-mp" id="mpD">5:30</div><div class="punit">min / km</div></div>
-      <div class="acol"><button class="ab" onclick="aMP(-5)">▲</button><button class="ab" onclick="aMP(5)">▼</button></div>
-    </div>
-  </div>
-  <div class="ctrl">
-    <div class="clbl">Target Finish Time</div>
+    <div class="clbl">Target Marathon Time</div>
     <div class="prow">
       <div><div class="pnum" id="tmD">3:51</div><div class="punit">hr : min</div></div>
       <div class="acol"><button class="ab" onclick="aTM(-1)">▲</button><button class="ab" onclick="aTM(1)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Target Marathon Pace</div>
+    <div class="prow">
+      <div>
+        <div class="pnum c-mp" id="mpD">5:30</div>
+        <div class="punit">min / km</div>
+        <div class="cur-mp-sub" id="curMPSub">
+          <span class="cur-mp-label">CURRENT FITNESS</span>
+          <span class="cur-mp-val" id="curMPVal">—</span>
+        </div>
+      </div>
+      <div class="acol"><button class="ab" onclick="aMP(-5)">▲</button><button class="ab" onclick="aMP(5)">▼</button></div>
     </div>
   </div>
   <div class="ctrl">
@@ -263,10 +272,10 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
       <svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#f97316" stroke-width="2.5" stroke-dasharray="7 4"/></svg>
       TARGET PACE</div>
     <div class="cleg"><div class="cl" style="background:repeating-linear-gradient(90deg,#3b82f6 0,#3b82f6 4px,transparent 4px,transparent 8px);height:2px"></div>CURRENT FITNESS</div>
-    <div class="cleg"><div class="cl" style="background:rgba(239,68,68,.2);height:8px;border-radius:1px"></div>GAP</div>
-    <div class="cleg" style="margin-left:8px"><div class="cl" style="background:var(--int);height:2px"></div>INTERVAL ∨∨∨ → 5K</div>
-    <div class="cleg"><div class="cl" style="background:var(--tempo);height:2px"></div>TEMPO ⎽|‾|⎽ → 10K</div>
-    <div class="cleg"><div class="cl" style="background:var(--long);height:2px"></div>LONG RUN ——● → MP</div>
+    <div class="cleg"><div class="cl" style="background:rgba(239,68,68,.2);height:8px;border-radius:1px"></div>GAP TO CLOSE</div>
+    <div class="cleg" style="margin-left:8px"><div class="cl" style="background:var(--int);height:2px"></div>INTERVAL → PIERCE TARGET</div>
+    <div class="cleg"><div class="cl" style="background:var(--tempo);height:2px"></div>TEMPO → BETWEEN LINES</div>
+    <div class="cleg"><div class="cl" style="background:var(--long);height:2px"></div>LONG RUN (easy+MP finish)</div>
   </div>
 
   <div class="chart-outer" id="chartOuter">
@@ -275,7 +284,7 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
       <div class="ttt" id="cttT"></div>
       <div class="ttc" id="cttC"></div>
     </div>
-    <svg id="cSvg" height="320"></svg>
+    <svg id="cSvg" height="420"></svg>
   </div>
 </div>
 
@@ -293,13 +302,10 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
 <script>
 // ─── CONSTANTS ───────────────────────────────
 const MA = 42.195;
-// Evenly-spaced x checkpoints (index 0 = km 0 used only for axis, not Riegel)
 const CDISTS = [0, 1, 3, 5, 10, 15, 20, 21.0975, 42.195];
 const CLBLS  = ['0','1','3','5','10','15','20','21','42.2'];
 const CN = CDISTS.length;
-
-// Riegel data points start from index 1 (km 1), target doesn't go to zero
-const RIEGEL_START = 1; // index into CDISTS
+const RIEGEL_START = 1;
 
 // ─── STATE ───────────────────────────────────
 let mpSecs   = 5*60+30;
@@ -362,55 +368,128 @@ function renderAll(){
   buildPlan();
 }
 
-// Show current min/km derived from fitness input
 function updateCurPace(){
   const fit=getFit();
   const box=document.getElementById('curPaceVal');
-  if(!fit){box.textContent='—';return;}
-  // Show pace at the selected distance (their per-km pace for that event)
+  const sub=document.getElementById('curMPSub');
+  const subVal=document.getElementById('curMPVal');
+  if(!fit){box.textContent='—';sub.style.display='none';return;}
   const paceSec=fit.tot/fit.dist;
   box.textContent=fmt(paceSec);
+  // Show current predicted marathon pace under target
+  const curMP=rFrom(fit.tot,fit.dist,MA);
+  subVal.textContent=fmt(curMP)+'/km';
+  sub.style.display='block';
 }
 
+// Gap badge: red=slower than target, green=17+ min faster, orange=closing
 function updateGap(){
   const fit=getFit(),b=document.getElementById('gBadge');
   if(!fit){b.textContent='—';b.className='gbadge empty';return;}
   const curMP=rFrom(fit.tot,fit.dist,MA);
   const gm=Math.round((curMP-mpSecs)*MA/60);
-  if(Math.abs(gm)<2){b.textContent='✓ ON TARGET';b.className='gbadge ontrack';}
-  else if(gm>0){b.textContent=`${gm} min behind target`;b.className='gbadge behind';}
-  else{b.textContent=`${Math.abs(gm)} min ahead`;b.className='gbadge ahead';}
+  if(gm>0){b.textContent=`${gm} min behind target`;b.className='gbadge behind';}
+  else if(Math.abs(gm)>=17){b.textContent=`${Math.abs(gm)} min ahead ✓`;b.className='gbadge ahead';}
+  else{b.textContent=`${Math.abs(gm)} min to close`;b.className='gbadge closing';}
 }
 
-// ─── WEEK PACE CONVERGENCE ───────────────────
+// ─── PACE FUNCTIONS ───────────────────────────
+// Long run easy pace: research-based ~60s/km slower than current marathon equivalent
+// Based on McMillan/Daniels: easy = MP + 45-90 sec/km. Using 60s/km as midpoint.
+const wEasyP=()=>{
+  const fit=getFit();
+  const base=fit?rFrom(fit.tot,fit.dist,MA):mpSecs*1.12;
+  return base+60; // 60 sec/km slower = conversational easy/long run pace
+};
+
+// Interval: converges from current 5K pace toward slightly faster than 5K target
+// This means intervals PIERCE through the target line on the chart
 function wIntPace(w){
-  const tp=weeks-3,target=rAtD(5),fit=getFit();
-  const start=fit?rFrom(fit.tot,fit.dist,5):target*1.20;
-  return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
+  const tp=weeks-3, target=rAtD(5), fit=getFit();
+  const start=fit?rFrom(fit.tot,fit.dist,5):target*1.22;
+  const end=target*0.96; // 4% faster than target 5K = true interval effort
+  return start+(end-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.68);
 }
+
+// Tempo: sits BETWEEN current marathon pace and target marathon pace
 function wTmpPace(w){
-  const tp=weeks-3,target=rAtD(10),fit=getFit();
-  const start=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
+  const tp=weeks-3, target=rAtD(10), fit=getFit();
+  const start=fit?rFrom(fit.tot,fit.dist,10):target*1.15;
   return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
 }
+
 function wLongPace(w){
   const tp=weeks-3,target=mpSecs,fit=getFit();
   const start=fit?rFrom(fit.tot,fit.dist,MA):target*1.10;
   return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
 }
-const wEasyP=()=>mpSecs*1.24;
 
+// ─── VARIED SESSION GENERATORS ────────────────
+// Research: vary intervals - different distances, reps, and types each week
+function getIntervalSession(wIdx){
+  const tp=weeks-3;
+  const prog=clamp(wIdx/Math.max(tp-1,1),0,1);
+  const phase=wIdx>=tp?'TAPER':prog<0.44?'BASE':'BUILD';
+  const wMod=wIdx%5;
+
+  if(phase==='TAPER') return {reps:3,dist:1.0,type:'REPS',label:'3×1km'};
+
+  if(phase==='BASE'){
+    const baseSessions=[
+      {reps:4,dist:0.4,type:'REPS',label:'4×400m'},
+      {reps:6,dist:0.4,type:'REPS',label:'6×400m'},
+      {reps:4,dist:0.6,type:'REPS',label:'4×600m'},
+      {reps:5,dist:0.6,type:'REPS',label:'5×600m'},
+      {reps:4,dist:0.8,type:'REPS',label:'4×800m'},
+    ];
+    return baseSessions[wMod];
+  }
+
+  // BUILD phase — longer, more varied
+  const buildSessions=[
+    {reps:5,dist:0.8,type:'REPS',label:'5×800m'},
+    {reps:4,dist:1.0,type:'REPS',label:'4×1km'},
+    {reps:3,dist:1.6,type:'REPS',label:'3×1mile'},
+    {reps:6,dist:0.8,type:'OVER/UNDER',label:'6×O/U 800m'},
+    {reps:2,dist:2.0,type:'REPS',label:'2×2km'},
+  ];
+  return buildSessions[wMod];
+}
+
+// Research: tempo variety — continuous runs, reps, over/under, progression
+function getTempoSession(wIdx){
+  const tp=weeks-3;
+  const prog=clamp(wIdx/Math.max(tp-1,1),0,1);
+  const phase=wIdx>=tp?'TAPER':prog<0.44?'BASE':'BUILD';
+  const wMod=wIdx%4;
+
+  if(phase==='TAPER') return {reps:1,dist:3.0,type:'CONTINUOUS',label:'3km tempo'};
+
+  if(phase==='BASE'){
+    const d=parseFloat((1.5+prog*1.0).toFixed(1));
+    return {reps:2,dist:d,type:'REPS',label:`2×${d}km`};
+  }
+
+  // BUILD phase
+  const buildSessions=[
+    {reps:2,dist:parseFloat((2.5+prog*2).toFixed(1)),type:'REPS',label:`2×${(2.5+prog*2).toFixed(1)}km`},
+    {reps:1,dist:parseFloat((5+prog*4).toFixed(0)),type:'CONTINUOUS',label:`${(5+prog*4).toFixed(0)}km steady`},
+    {reps:3,dist:1.6,type:'OVER/UNDER',label:'3×1mile O/U'},
+    {reps:2,dist:parseFloat((3.0+prog*1.5).toFixed(1)),type:'REPS',label:`2×${(3.0+prog*1.5).toFixed(1)}km`},
+  ];
+  return buildSessions[wMod];
+}
+
+// ─── WEEK TAGS ────────────────────────────────
 function updateTags(){
   const w=wkOvr,tp=weeks-3;
   const phase=w<Math.floor(weeks*.44)?'BASE':w<tp?'BUILD':'TAPER';
-  const prog=clamp(w/Math.max(tp-1,1),0,1);
   const lkm=getLongKm(w,weeks);
-  const treps=Math.round(2+prog*2);
-  const tkm=(1+prog*1.5).toFixed(1);
-  const ireps=4,ikm=(0.4+prog*0.5).toFixed(1);
+  const iSess=getIntervalSession(w);
+  const tSess=getTempoSession(w);
   document.getElementById('wosWk').textContent=`WEEK ${w+1} · ${phase}`;
-  document.getElementById('wosI').textContent=`Interval: ${ireps}×${ikm}km @ ${fmt(wIntPace(w))}`;
-  document.getElementById('wosT').textContent=`Tempo: ${treps}×${tkm}km @ ${fmt(wTmpPace(w))}`;
+  document.getElementById('wosI').textContent=`Interval: ${iSess.label} @ ${fmt(wIntPace(w))}`;
+  document.getElementById('wosT').textContent=`Tempo: ${tSess.label} @ ${fmt(wTmpPace(w))}`;
   document.getElementById('wosL').textContent=`Long: ${lkm}km @ ${fmt(wLongPace(w))} MP`;
 }
 
@@ -418,40 +497,38 @@ function updateTags(){
 function drawChart(){
   const svg=document.getElementById('cSvg');
   const outer=document.getElementById('chartOuter');
-  const W=svg.clientWidth||(outer.clientWidth-64)||700;
-  const H=320,PT=18,PB=56,cH=H-PT-PB,cW=W;
+  const W=svg.clientWidth||(outer.clientWidth-64)||900;
+  const H=420,PT=18,PB=56,cH=H-PT-PB,cW=W;
 
-  // X: evenly spaced by index
   const xOfIdx = i => (i/(CN-1))*cW;
 
   const easyP=wEasyP(),fit=getFit();
 
-  // Riegel paces — only for CDISTS[RIEGEL_START..] (km 1 onwards), NOT km 0
   const tPaces=CDISTS.map((d,i)=>i<RIEGEL_START?null:rAtD(d));
   const cPaces=fit?CDISTS.map((d,i)=>i<RIEGEL_START?null:rFrom(fit.tot,fit.dist,d)):null;
 
-  // Y range from all real paces + overlay paces
+  // ── Y RANGE: zoom tightly to the gap between current and target ──
+  // Intervals pierce ABOVE target (faster), tempo sits between lines.
   const realTP=tPaces.filter(p=>p!==null);
   const realCP=cPaces?cPaces.filter(p=>p!==null):[];
-  const allP=[...realTP,...realCP,easyP,wIntPace(wkOvr)*0.96];
-  const minP=Math.min(...allP)*0.970; // fastest pace value → top of chart
-  const maxP=Math.max(...allP)*1.032; // slowest pace value → bottom of chart
+  const intPNow=wIntPace(wkOvr);
+  const fastestVisible=Math.min(...realTP, intPNow*0.97);
+  const slowestVisible=fit?Math.max(...realCP,easyP):Math.max(...realTP)*1.18;
+  const spread=slowestVisible-fastestVisible;
+  const minP=fastestVisible-spread*0.10; // 10% padding top
+  const maxP=slowestVisible+spread*0.10; // 10% padding bottom
 
-  // ── INVERTED Y: fast (low pace number) = TOP (small svg y) ──
-  // When p is small (fast): (p-minP) is small → y is small → near top ✓
-  // When p is large (slow): (p-minP) is large → y is large → near bottom ✓
   const yOf = p => PT + ((p - minP) / (maxP - minP)) * cH;
 
   let h='';
 
-  // Y gridlines — label them, note fast is at top
-  for(let i=0;i<=5;i++){
-    const p=minP+(i/5)*(maxP-minP);
+  // Y gridlines
+  for(let i=0;i<=6;i++){
+    const p=minP+(i/6)*(maxP-minP);
     const y=yOf(p);
     h+=`<line x1="0" y1="${y.toFixed(1)}" x2="${cW}" y2="${y.toFixed(1)}" stroke="#141420" stroke-width="1"/>`;
     h+=`<text x="-6" y="${(y+4).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="8.5" fill="#2e2e46">${fmt(p)}</text>`;
   }
-  // "FAST" / "SLOW" axis labels
   h+=`<text x="-6" y="${(PT+6).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="6.5" fill="#3a3a56" letter-spacing="1">FAST ↑</text>`;
   h+=`<text x="-6" y="${(PT+cH+2).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="6.5" fill="#3a3a56" letter-spacing="1">SLOW ↓</text>`;
 
@@ -465,17 +542,16 @@ function drawChart(){
   h+=`<text x="${(cW/2).toFixed(0)}" y="${(PT+cH+28).toFixed(0)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">DISTANCE (KM)</text>`;
   h+=`<text transform="rotate(-90)" x="${-(PT+cH/2).toFixed(0)}" y="-40" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">PACE (MIN/KM)</text>`;
 
-  // ── WEEK TRAINING OVERLAY ──
   h+=drawOverlay(wkOvr,xOfIdx,yOf,easyP,cW,cH,PT);
 
-  // ── GAP POLYGON (between current and target, km1 onwards) ──
+  // GAP POLYGON
   if(cPaces){
     const fw=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(cPaces[i]).toFixed(1)}`).filter(Boolean);
     const bk=CDISTS.map((_,i)=>{const ri=CN-1-i;return ri<RIEGEL_START?null:`${xOfIdx(ri).toFixed(1)},${yOf(tPaces[ri]).toFixed(1)}`;}).filter(Boolean);
-    h+=`<polygon points="${[...fw,...bk].join(' ')}" fill="rgba(239,68,68,0.07)" stroke="none"/>`;
+    h+=`<polygon points="${[...fw,...bk].join(' ')}" fill="rgba(239,68,68,0.08)" stroke="none"/>`;
   }
 
-  // ── CURRENT FITNESS CURVE (km1 onwards, dashed blue) ──
+  // CURRENT FITNESS CURVE
   if(cPaces){
     const pts=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(cPaces[i]).toFixed(1)}`).filter(Boolean).join(' ');
     h+=`<polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>`;
@@ -485,7 +561,7 @@ function drawChart(){
     });
   }
 
-  // ── TARGET PACE CURVE (km1 onwards, dashed orange) ──
+  // TARGET PACE CURVE
   const tPts=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(tPaces[i]).toFixed(1)}`).filter(Boolean).join(' ');
   h+=`<polyline points="${tPts}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="10 5" stroke-linecap="round"/>`;
   CDISTS.forEach((d,i)=>{
@@ -495,7 +571,7 @@ function drawChart(){
     h+=`<text x="${x.toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(249,115,22,.8)">${fmt(tPaces[i])}</text>`;
   });
 
-  // ── HOVER ZONES (km1 onwards) ──
+  // HOVER ZONES
   CDISTS.forEach((d,i)=>{
     if(i<RIEGEL_START)return;
     const x1=(xOfIdx(i-1)+xOfIdx(i))/2;
@@ -540,73 +616,125 @@ function drawOverlay(wIdx,xOfIdx,yOf,easyP,cW,cH,PT){
   const lkm   = getLongKm(wIdx,weeks);
   const mpfrac= getMPFrac(wIdx,weeks);
   const mpkm  = Math.round(lkm*mpfrac*10)/10;
+  const iSess = getIntervalSession(wIdx);
+  const tSess = getTempoSession(wIdx);
 
-  // Zone pixel boundaries (by index)
-  const zIL=xOfIdx(1),zIR=xOfIdx(3); // interval zone: idx 1-3 (km 1-5)
-  const zTL=xOfIdx(3),zTR=xOfIdx(5); // tempo zone: idx 3-5 (km 5-15)
-  const zLL=xOfIdx(5),zLR=xOfIdx(8); // long zone: idx 5-8 (km 15-42.2)
+  const zIL=xOfIdx(1),zIR=xOfIdx(3);
+  const zTL=xOfIdx(3),zTR=xOfIdx(5);
+  const zLL=xOfIdx(5),zLR=xOfIdx(8);
   const zIW=zIR-zIL, zTW=zTR-zTL, zLW=zLR-zLL;
 
   let h='';
 
-  // Zone background tints
+  // Zone tints
   h+=`<rect x="${zIL.toFixed(1)}" y="${PT}" width="${zIW.toFixed(1)}" height="${cH}" fill="rgba(250,204,21,0.025)"/>`;
   h+=`<rect x="${zTL.toFixed(1)}" y="${PT}" width="${zTW.toFixed(1)}" height="${cH}" fill="rgba(239,68,68,0.025)"/>`;
   h+=`<rect x="${zLL.toFixed(1)}" y="${PT}" width="${zLW.toFixed(1)}" height="${cH}" fill="rgba(52,211,153,0.025)"/>`;
-
-  // Zone labels (top, faint)
   h+=`<text x="${((zIL+zIR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(250,204,21,0.35)" letter-spacing="1">INTERVAL</text>`;
   h+=`<text x="${((zTL+zTR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(239,68,68,0.35)" letter-spacing="1">TEMPO</text>`;
   h+=`<text x="${((zLL+zLR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(52,211,153,0.35)" letter-spacing="1">LONG RUN</text>`;
 
-  // ── INTERVAL: VVV ──
-  // In inverted chart: interval (fast) → small y → appears near TOP ✓
-  const iWarm=zIW*0.15, iCool=zIW*0.10;
-  const IREPS=4;
+  // ── INTERVAL ZONE ──
+  // Intervals are FASTER than current pace and PIERCE the target pace line
+  const IREPS = iSess.reps;
+  const iWarm=zIW*0.12, iCool=zIW*0.08;
   const repBlock=(zIW-iWarm-iCool)/IREPS;
-  const repDown=repBlock*0.45, repUp=repBlock*0.45, repRec=repBlock*0.10;
-  let iPts=[], ix=zIL;
-  iPts.push([ix,easyP]); ix+=iWarm; iPts.push([ix,easyP]);
-  for(let r=0;r<IREPS;r++){
-    iPts.push([ix,easyP]);
-    iPts.push([ix+repDown,intP]);        // V tip at this week's interval pace (fast → high on chart)
-    iPts.push([ix+repDown+repUp,easyP]);
-    ix+=repDown+repUp+repRec;
-    if(r<IREPS-1)iPts.push([ix,easyP]);
-  }
-  iPts.push([ix,easyP]); ix+=iCool; iPts.push([ix,easyP]);
-  h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
-  const iVtipX=iPts[2][0]+repDown;
-  // In inverted chart: interval pace is fast → small y → tip points UP
-  h+=`<text x="${iVtipX.toFixed(1)}" y="${(yOf(intP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km</text>`;
+  const repDown=repBlock*0.42, repUp=repBlock*0.42, repRec=repBlock*0.16;
 
-  // ── TEMPO: ⎽|‾|⎽ multi-block ──
-  // Tempo (faster than easy) → smaller y → plateaus appear ABOVE easy baseline
-  const TREPS=Math.round(2+prog*2);
-  const tWarm=zTW*0.12, tCool=zTW*0.10;
-  const tAvail=zTW-tWarm-tCool;
-  const tRep=tAvail/(TREPS*1.8); // rep width
-  const tRec=tRep*0.8;
-  const tTotal2=TREPS*tRep+(TREPS-1)*tRec;
-  const tScale=tAvail/tTotal2;
-  const tRep2=tRep*tScale, tRec2=tRec*tScale;
-  let tPts=[], tx=zTL;
-  tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
-  for(let r=0;r<TREPS;r++){
-    tPts.push([tx,easyP]);
-    tPts.push([tx,tmpP]);       // tempo pace faster → smaller y → bar goes UP
-    tx+=tRep2;
-    tPts.push([tx,tmpP]);
-    tPts.push([tx,easyP]);
-    if(r<TREPS-1){tx+=tRec2;tPts.push([tx,easyP]);}
+  if(iSess.type==='OVER/UNDER'){
+    // Alternating above/below interval pace (wave pattern)
+    const overP=intP*0.97;   // slightly faster
+    const underP=intP*1.03;  // slightly slower
+    let iPts=[],ix=zIL;
+    iPts.push([ix,easyP]); ix+=iWarm; iPts.push([ix,easyP]);
+    for(let r=0;r<IREPS;r++){
+      const p=r%2===0?overP:underP;
+      iPts.push([ix,easyP]);
+      iPts.push([ix+repDown,p]);
+      iPts.push([ix+repDown+repUp,easyP]);
+      ix+=repDown+repUp+repRec;
+      if(r<IREPS-1)iPts.push([ix,easyP]);
+    }
+    iPts.push([ix,easyP]); ix+=iCool; iPts.push([ix,easyP]);
+    h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    h+=`<text x="${(zIL+zIW/2).toFixed(1)}" y="${(yOf(overP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km O/U</text>`;
+  } else {
+    // Standard V-rep intervals — dip down to fast pace (visually UP in inverted chart)
+    let iPts=[],ix=zIL;
+    iPts.push([ix,easyP]); ix+=iWarm; iPts.push([ix,easyP]);
+    for(let r=0;r<IREPS;r++){
+      iPts.push([ix,easyP]);
+      iPts.push([ix+repDown,intP]); // V tip = interval pace (faster than target → above target line)
+      iPts.push([ix+repDown+repUp,easyP]);
+      ix+=repDown+repUp+repRec;
+      if(r<IREPS-1)iPts.push([ix,easyP]);
+    }
+    iPts.push([ix,easyP]); ix+=iCool; iPts.push([ix,easyP]);
+    h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iVtipX=iWarm+zIL+repDown;
+    h+=`<text x="${iVtipX.toFixed(1)}" y="${(yOf(intP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km</text>`;
   }
-  tx+=tCool; tPts.push([tx,easyP]);
-  h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
-  const tFirstMid=tPts[2][0]+(tRep2/2);
-  h+=`<text x="${tFirstMid.toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
+
+  // ── TEMPO ZONE ──
+  // Tempo sits BETWEEN current pace (lower on chart) and target pace (higher)
+  if(tSess.type==='CONTINUOUS'){
+    // One long sustained block
+    const tAvail=zTW*0.76;
+    const tStartX=zTL+zTW*0.12;
+    const tEndX=tStartX+tAvail;
+    h+=`<polyline points="${zTL.toFixed(1)},${yOf(easyP).toFixed(1)} ${tStartX.toFixed(1)},${yOf(easyP).toFixed(1)} ${tStartX.toFixed(1)},${yOf(tmpP).toFixed(1)} ${tEndX.toFixed(1)},${yOf(tmpP).toFixed(1)} ${tEndX.toFixed(1)},${yOf(easyP).toFixed(1)} ${(zTL+zTW).toFixed(1)},${yOf(easyP).toFixed(1)}"
+      fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    h+=`<text x="${((tStartX+tEndX)/2).toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
+  } else if(tSess.type==='OVER/UNDER'){
+    // Alternating above/below tempo threshold (like a progression ladder)
+    const TREPS=tSess.reps;
+    const overP=tmpP*0.98;
+    const underP=tmpP*1.02;
+    const tWarm=zTW*0.12, tCool=zTW*0.10;
+    const tAvail=zTW-tWarm-tCool;
+    const repW=tAvail/TREPS;
+    let tPts=[],tx=zTL;
+    tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
+    for(let r=0;r<TREPS;r++){
+      const p=r%2===0?overP:underP;
+      tPts.push([tx,easyP]);
+      tPts.push([tx,p]);
+      tx+=repW;
+      tPts.push([tx,p]);
+      tPts.push([tx,easyP]);
+    }
+    tx+=tCool; tPts.push([tx,easyP]);
+    h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    h+=`<text x="${(zTL+zTW/2).toFixed(1)}" y="${(yOf(overP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km O/U</text>`;
+  } else {
+    // Standard reps
+    const TREPS=tSess.reps;
+    const tWarm=zTW*0.12, tCool=zTW*0.10;
+    const tAvail=zTW-tWarm-tCool;
+    const tRep=tAvail/(TREPS*1.8);
+    const tRec=tRep*0.8;
+    const tTotal2=TREPS*tRep+(TREPS-1)*tRec;
+    const tScale=tAvail/tTotal2;
+    const tRep2=tRep*tScale, tRec2=tRec*tScale;
+    let tPts=[],tx=zTL;
+    tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
+    for(let r=0;r<TREPS;r++){
+      tPts.push([tx,easyP]);
+      tPts.push([tx,tmpP]);
+      tx+=tRep2;
+      tPts.push([tx,tmpP]);
+      tPts.push([tx,easyP]);
+      if(r<TREPS-1){tx+=tRec2;tPts.push([tx,easyP]);}
+    }
+    tx+=tCool; tPts.push([tx,easyP]);
+    h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    const tFirstMid=tPts[2][0]+(tRep2/2);
+    h+=`<text x="${tFirstMid.toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
+  }
 
   // ── LONG RUN ──
-  // Easy flat, then step UP (faster MP pace) for the MP section, endpoint dot
+  // Research: easy at current pace + 60s/km, finish with MP section
+  // Per Daniels/McMillan: long run = conversational effort, ~1 min/km slower than MP
   const MAX_LONG=34;
   const lFrac=Math.min(lkm/MAX_LONG,1);
   const lEndX=zLL+lFrac*zLW;
@@ -614,12 +742,13 @@ function drawOverlay(wIdx,xOfIdx,yOf,easyP,cW,cH,PT){
   const mpStartX=zLL+mpStartFrac*zLW;
 
   if(mpkm>0){
-    // Long run pace (MP) is faster than easy → smaller y → step goes UP in chart
     h+=`<polyline points="${zLL.toFixed(1)},${yOf(easyP).toFixed(1)} ${mpStartX.toFixed(1)},${yOf(easyP).toFixed(1)} ${mpStartX.toFixed(1)},${yOf(longP).toFixed(1)} ${lEndX.toFixed(1)},${yOf(longP).toFixed(1)}" fill="none" stroke="rgba(52,211,153,0.7)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
     const mpMidX=(mpStartX+lEndX)/2;
-    h+=`<text x="${mpMidX.toFixed(1)}" y="${(yOf(longP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(52,211,153,.8)">${fmt(longP)}/km</text>`;
+    h+=`<text x="${mpMidX.toFixed(1)}" y="${(yOf(longP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(52,211,153,.8)">${fmt(longP)}/km MP</text>`;
+    h+=`<text x="${(zLL+8).toFixed(1)}" y="${(yOf(easyP)+14).toFixed(1)}" font-family="DM Mono,monospace" font-size="7" fill="rgba(52,211,153,.5)">easy ~${fmt(easyP)}</text>`;
   } else {
     h+=`<polyline points="${zLL.toFixed(1)},${yOf(easyP).toFixed(1)} ${lEndX.toFixed(1)},${yOf(easyP).toFixed(1)}" fill="none" stroke="rgba(52,211,153,0.7)" stroke-width="2.5" stroke-linecap="square"/>`;
+    h+=`<text x="${(zLL+8).toFixed(1)}" y="${(yOf(easyP)+14).toFixed(1)}" font-family="DM Mono,monospace" font-size="7" fill="rgba(52,211,153,.5)">easy ~${fmt(easyP)}</text>`;
   }
   const epY=yOf(mpkm>0?longP:easyP);
   h+=`<circle cx="${lEndX.toFixed(1)}" cy="${epY.toFixed(1)}" r="7" fill="none" stroke="rgba(52,211,153,0.25)" stroke-width="1.5"/>`;
@@ -665,21 +794,43 @@ function mkWeek(wIdx,rec,phase,delay){
   const bars=document.createElement('div');bars.className='run-bars';
   const lkm=getLongKm(wIdx,weeks),mpf=getMPFrac(wIdx,weeks),tp=weeks-3;
   const ekm=rec?6:phase==='TAPER'?8:Math.min(12,7+Math.floor(wIdx/4));
+
+  // Easy run
   bars.appendChild(mkBar('EASY',ekm,[{t:'easy',km:ekm}],lkm,null));
+
+  // Interval session
   if(!(phase==='TAPER'&&wIdx>=tp+1)){
+    const iSess=getIntervalSession(wIdx);
+    const totalIKm=parseFloat((1.2+iSess.reps*iSess.dist+(iSess.reps-1)*0.3+0.8).toFixed(1));
+    const iSegs=[{t:'easy',km:1.2}];
+    for(let r=0;r<iSess.reps;r++){iSegs.push({t:'tempo',km:iSess.dist});if(r<iSess.reps-1)iSegs.push({t:'easy',km:0.3});}
+    iSegs.push({t:'easy',km:0.8});
+    bars.appendChild(mkBar(`INT ${iSess.label}`,totalIKm,iSegs,lkm,'rgba(250,204,21,0.9)'));
+  }
+
+  // Tempo session
+  if(!(phase==='TAPER'&&wIdx>=tp+1)){
+    const tSess=getTempoSession(wIdx);
     const wt=wTmpPace(wIdx),target=calcTP(),fit=getFit();
     const startT=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
     const pr2=clamp(1-(wt-target)/Math.max(startT-target,.001),0,1);
     const tCol=`hsl(${Math.round(220-220*pr2)},80%,56%)`;
-    let rk=phase==='BASE'?(rec?.8:1.0):phase==='BUILD'?parseFloat((1+(wIdx/weeks)*1.5).toFixed(1)):1.0;
-    const reps=phase==='TAPER'?3:4;
-    const segs=[{t:'easy',km:1.5}];
-    for(let r=0;r<reps;r++){segs.push({t:'tempo',km:rk});if(r<reps-1)segs.push({t:'easy',km:.5});}
-    segs.push({t:'easy',km:1});
-    bars.appendChild(mkBar(`TEMPO ${reps}×${rk.toFixed(1)}K`,parseFloat((1.5+reps*rk+(reps-1)*.5+1).toFixed(1)),segs,lkm,tCol));
+    let totalTKm,tSegs;
+    if(tSess.type==='CONTINUOUS'){
+      totalTKm=parseFloat((1.5+tSess.dist+1).toFixed(1));
+      tSegs=[{t:'easy',km:1.5},{t:'tempo',km:tSess.dist},{t:'easy',km:1}];
+    } else {
+      totalTKm=parseFloat((1.5+tSess.reps*tSess.dist+(tSess.reps-1)*0.5+1).toFixed(1));
+      tSegs=[{t:'easy',km:1.5}];
+      for(let r=0;r<tSess.reps;r++){tSegs.push({t:'tempo',km:tSess.dist});if(r<tSess.reps-1)tSegs.push({t:'easy',km:0.5});}
+      tSegs.push({t:'easy',km:1});
+    }
+    bars.appendChild(mkBar(`TEMPO ${tSess.label}`,totalTKm,tSegs,lkm,tCol));
   }
+
   bars.appendChild(mkLongBar(lkm,mpf,phase));
   content.appendChild(bars);
+
   const target=calcTP(),fit=getFit(),startT=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
   const wt=wTmpPace(wIdx),trackMax=Math.max(startT,target*1.18),trackMin=target*0.98;
   const pos=p=>clamp(1-(p-trackMin)/(trackMax-trackMin),0,1);
