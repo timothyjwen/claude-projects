@@ -498,8 +498,8 @@ function drawChart(){
   const intPNow=wIntPace(wkOvr);
   const wEasyNow=wEasyP();
   const allPaces=[...realTP,...realCP, intPNow, wEasyNow];
-  const minP=Math.min(...allPaces)*0.94;
-  const maxP=Math.max(...allPaces)*1.06;
+  const minP=Math.min(...allPaces)*0.99;
+  const maxP=Math.max(...allPaces)*1.01;
 
   const yOf = p => PT + ((p - minP) / (maxP - minP)) * cH;
 
