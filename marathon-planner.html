@@ -493,19 +493,13 @@ function drawChart(){
   const tPaces=CDISTS.map((d,i)=>i<RIEGEL_START?null:rAtD(d));
   const cPaces=fit?CDISTS.map((d,i)=>i<RIEGEL_START?null:rFrom(fit.tot,fit.dist,d)):null;
 
-  // ── Y RANGE: focused on the gap between target and current ──
-  // Chart mainly shows the band between target (fast/top) and current (slow/bottom).
-  // Interval spikes pierce above target; easy long run sits just below current.
   const realTP=tPaces.filter(p=>p!==null);
   const realCP=cPaces?cPaces.filter(p=>p!==null):[];
   const intPNow=wIntPace(wkOvr);
-  const curMP=fit?rFrom(fit.tot,fit.dist,MA):mpSecs*1.15;
-  const targetFastest=Math.min(...realTP);
-  const gapTop=Math.min(intPNow,targetFastest); // intervals may pierce above target
-  const gapBot=curMP;
-  const gapSize=Math.max(gapBot-gapTop,15); // minimum spread so chart isn't empty
-  const minP=gapTop-gapSize*0.08;  // tight padding — intervals just peek above
-  const maxP=gapBot+gapSize*0.08;  // tight padding — current fitness at bottom
+  const wEasyNow=wEasyP();
+  const allPaces=[...realTP,...realCP, intPNow, wEasyNow];
+  const minP=Math.min(...allPaces)*0.94;
+  const maxP=Math.max(...allPaces)*1.06;
 
   const yOf = p => PT + ((p - minP) / (maxP - minP)) * cH;
 
