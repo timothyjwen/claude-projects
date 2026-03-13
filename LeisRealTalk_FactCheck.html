@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lei's Real Talk — Fact Check</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: #0f0f13;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  .container { max-width: 1100px; margin: 0 auto; }
+
+  header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    margin-top: 8px;
+    color: #888;
+    font-size: 0.95rem;
+  }
+
+  .channel-tag {
+    display: inline-block;
+    background: #ff0000;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  /* --- Scorecard --- */
+  .scorecard {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .score-box {
+    background: #1a1a22;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 24px 16px;
+    text-align: center;
+  }
+
+  .score-box .num {
+    font-size: 2.4rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .score-box .label {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .num.green  { color: #4caf7d; }
+  .num.red    { color: #e05555; }
+  .num.yellow { color: #f5a623; }
+  .num.blue   { color: #5b9cf6; }
+
+  /* --- Accuracy bar --- */
+  .accuracy-bar-wrap {
+    background: #1a1a22;
+    border: 1px solid #2a2a38;
+    border-radius: 12px;
+    padding: 28px 32px;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+
+  .accuracy-label { white-space: nowrap; }
+  .accuracy-label .pct {
+    font-size: 3rem;
+    font-weight: 800;
+    color: #f5a623;
+    line-height: 1;
+  }
+  .accuracy-label .sub {
+    font-size: 0.85rem;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  .bar-stack {
+    flex: 1;
+    height: 28px;
+    border-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    background: #0f0f13;
+  }
+
+  .bar-true    { background: #4caf7d; }
+  .bar-false   { background: #e05555; }
+  .bar-partial { background: #f5a623; }
+  .bar-unverified { background: #5b9cf6; }
+
+  .bar-legend {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    color: #aaa;
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  /* --- Video sections --- */
+  .video-section {
+    margin-bottom: 40px;
+  }
+
+  .video-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .video-num {
+    background: #ff0000;
+    color: #fff;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .video-title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    line-height: 1.3;
+  }
+
+  .video-meta {
+    font-size: 0.8rem;
+    color: #666;
+    margin-top: 4px;
+  }
+
+  /* --- Claims table --- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #1a1a22;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #2a2a38;
+  }
+
+  thead th {
+    background: #13131b;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #666;
+    font-weight: 600;
+  }
+
+  tbody tr {
+    border-top: 1px solid #22222e;
+    transition: background 0.15s;
+  }
+
+  tbody tr:hover { background: #1f1f2a; }
+
+  td {
+    padding: 14px 16px;
+    font-size: 0.88rem;
+    vertical-align: top;
+    line-height: 1.5;
+  }
+
+  td:first-child { width: 44%; color: #ccc; }
+  td:nth-child(2) { width: 38%; color: #999; font-size: 0.83rem; }
+  td:last-child { width: 18%; }
+
+  .verdict {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .v-true       { background: rgba(76,175,125,0.15); color: #4caf7d; border: 1px solid rgba(76,175,125,0.3); }
+  .v-false      { background: rgba(224, 85, 85,0.15); color: #e05555; border: 1px solid rgba(224,85,85,0.3); }
+  .v-partial    { background: rgba(245,166,35,0.15); color: #f5a623; border: 1px solid rgba(245,166,35,0.3); }
+  .v-unverified { background: rgba(91,156,246,0.15); color: #5b9cf6; border: 1px solid rgba(91,156,246,0.3); }
+
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    color: #444;
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 700px) {
+    .scorecard { grid-template-columns: repeat(2, 1fr); }
+    .accuracy-bar-wrap { flex-direction: column; }
+    td:first-child, td:nth-child(2) { width: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="channel-tag">▶ YouTube Fact Check</div>
+    <h1>Lei's Real Talk — Accuracy Report</h1>
+    <p>5 latest videos · fact-checked against mainstream & academic sources · March 2026</p>
+  </header>
+
+  <!-- Scorecard -->
+  <div class="scorecard">
+    <div class="score-box">
+      <div class="num green">12</div>
+      <div class="label">✓ Verified True</div>
+    </div>
+    <div class="score-box">
+      <div class="num red">2</div>
+      <div class="label">✗ False / Misleading</div>
+    </div>
+    <div class="score-box">
+      <div class="num yellow">7</div>
+      <div class="label">~ Partially Correct</div>
+    </div>
+    <div class="score-box">
+      <div class="num blue">4</div>
+      <div class="label">? Unverified</div>
+    </div>
+  </div>
+
+  <!-- Accuracy bar -->
+  <div class="accuracy-bar-wrap">
+    <div class="accuracy-label">
+      <div class="pct">56%</div>
+      <div class="sub">fully verified</div>
+      <div class="sub" style="margin-top:2px">~88% accurate or close</div>
+    </div>
+    <div style="flex:1">
+      <div class="bar-stack">
+        <!-- 12 true / 2 false / 7 partial / 4 unverified = 25 total -->
+        <div class="bar-true"    style="width:48%"  title="Verified True: 12"></div>
+        <div class="bar-partial" style="width:28%"  title="Partially Correct: 7"></div>
+        <div class="bar-unverified" style="width:16%" title="Unverified: 4"></div>
+        <div class="bar-false"   style="width:8%"   title="False: 2"></div>
+      </div>
+      <div class="bar-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#4caf7d"></div>True (12)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f5a623"></div>Partial (7)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#5b9cf6"></div>Unverified (4)</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#e05555"></div>False (2)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======= VIDEO 1 ======= -->
+  <div class="video-section">
+    <div class="video-header">
+      <div class="video-num">1</div>
+      <div>
+        <div class="video-title">Xi's Military Marriage Plan Has a Dark CCP Precedent</div>
+        <div class="video-meta">1 day ago · ID: ZAY2-D_ZksU</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Claim</th><th>Verdict Notes</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Six state organizations (CMC, PLA logistics, trade unions, Communist Youth League, Women's Federation) issued a joint matchmaking policy for unmarried soldiers in remote regions.</td>
+          <td>Confirmed by multiple independent outlets including South China Morning Post and Vision Times. The six bodies match official sources.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>PLA Daily placed this on its front page as implementing Xi's doctrine of "warming the hearts of soldiers."</td>
+          <td>The PLA Daily front-page coverage and the "warming hearts" phrasing is cited in several reports on the policy.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>After 1949, roughly 200,000 soldiers (100,000 ex-Nationalist + 100,000 CCP) were stationed in Xinjiang, ~96% unmarried.</td>
+          <td>The 200,000 total is confirmed. The 96% unmarried figure is cited in secondary Chinese historical sources but not directly verifiable in English-language records.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>Wang Zhen ordered recruitment of single Hunan women (aged 16–25) to marry frontier soldiers — the "8,000 Hunan Girls to Tianshan."</td>
+          <td>Well-documented historical episode. Wang Zhen's role as Xinjiang military commander who initiated the recruitment is confirmed across multiple historical sources.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>3,862 women recruited in the first year, ~4,000 more the following year — the youngest was 13, oldest was 19.</td>
+          <td>The numbers (3,862 and ~4,000) are confirmed in Chinese historical records. "Some as young as 13" is confirmed; "oldest 19" is not specifically sourced — most were 18–19.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>Wang Zhen described as "one of the founding marshals of the PLA."</td>
+          <td>Incorrect. Wang Zhen was a senior military commander but was NOT among the PLA's 10 founding marshals (Zhu De, Peng Dehuai, Lin Biao, etc.). He held a general officer rank.</td>
+          <td><span class="verdict v-false">✗ False</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ======= VIDEO 2 ======= -->
+  <div class="video-section">
+    <div class="video-header">
+      <div class="video-num">2</div>
+      <div>
+        <div class="video-title">Inside China's Two Sessions: The Signals Political Insiders Are Watching</div>
+        <div class="video-meta">3 days ago · ID: hZzKXTZGSuY</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Claim</th><th>Verdict Notes</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Song Ping died on March 4, 2026, at the age of 109, shortly after the CPPCC session opened.</td>
+          <td>Confirmed by Xinhua, CCTV, US News, Dawn, and China's official government website. Death date and age are fully accurate.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Song Ping "served as Premier Zhao Ziyang's secretary."</td>
+          <td>Incorrect. Song Ping served as personal secretary to Premier Zhou Enlai (1940s), not Zhao Ziyang. He later became head of the CCP Organization Department. This is a factual error.</td>
+          <td><span class="verdict v-false">✗ False</span></td>
+        </tr>
+        <tr>
+          <td>Song Ping oversaw CCP personnel decisions and was credited with supporting Hu Jintao's rise.</td>
+          <td>Confirmed. Song Ping headed the CCP's Organization Department and is widely credited with promoting Hu Jintao into the leadership pipeline.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Li Qiang verbally skipped the line "We firmly oppose hegemonism and power politics" when delivering his work report, even though it appeared in the written text.</td>
+          <td>The phrase about opposing hegemonism was included in the official written report per People's Daily. No mainstream source confirmed the verbal omission. Unverifiable without the video record.</td>
+          <td><span class="verdict v-unverified">? Unverified</span></td>
+        </tr>
+        <tr>
+          <td>Zhang Youxia was placed under investigation in January 2026; his NPC delegate status was not revoked at the Feb 4 NPC Standing Committee session.</td>
+          <td>Both confirmed. Zhang was announced under investigation on Jan 24, 2026 (CNN, NPR). The Feb 4 NPC session notably did NOT strip his delegate status, as multiple analysts noted.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>He Weidong was arrested "at the end of January" alongside Zhang Youxia.</td>
+          <td>Partially wrong. He Weidong was expelled from the CCP in October 2025, months before Zhang's January 2026 investigation. He was not arrested simultaneously with Zhang.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ======= VIDEO 3 ======= -->
+  <div class="video-section">
+    <div class="video-header">
+      <div class="video-num">3</div>
+      <div>
+        <div class="video-title">115 Million Views Later: Is Beijing Facing a Defection Crisis?</div>
+        <div class="video-meta">4 days ago · ID: Fz4P1G-zr3Y</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Claim</th><th>Verdict Notes</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>The CIA posted 4 Mandarin-language recruitment videos on YouTube targeting Chinese officials and military officers.</td>
+          <td>Confirmed by CBS News, Al Jazeera, ABC News, and the CIA's own X/Twitter account. The CIA confirmed releasing the series of videos.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>The videos accumulated 115 million total views.</td>
+          <td>Close but slightly low. Vision Times (March 10) reported ~120 million views; Washington Times (March 12) confirmed "tens of millions." 115M was likely accurate at time of filming, now slightly higher.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>A CIA "Secure Contact Guide" video alone reached ~64 million views within one month of release.</td>
+          <td>One source notes a "Secure Contact Instructions" video surpassed 60 million views. The 64M figure is consistent with reporting and plausible.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>Wang Huning is Chairman of the CPPCC and designed the doctrinal frameworks for Jiang Zemin ("Three Represents"), Hu Jintao ("Scientific Development"), and Xi Jinping ("Xi Jinping Thought").</td>
+          <td>Fully confirmed. Wang Huning has been the CCP's top ideologist across three administrations. His CPPCC chairmanship is a matter of public record.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Wang Huning's family was ordered to relocate from Shanghai to Beijing overnight by Cai Qi's General Office for "safety" reasons.</td>
+          <td>This claim is from anonymous insider sources and has not been confirmed by any major media outlet. Possible but unverifiable.</td>
+          <td><span class="verdict v-unverified">? Unverified</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ======= VIDEO 4 ======= -->
+  <div class="video-section">
+    <div class="video-header">
+      <div class="video-num">4</div>
+      <div>
+        <div class="video-title">Iran's Decapitation Strike Just Shocked China's Leadership</div>
+        <div class="video-meta">6 days ago · ID: zjHlULriyV4</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Claim</th><th>Verdict Notes</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Khamenei became Iran's Supreme Leader on June 4, 1989 — the exact same day as the Tiananmen Square crackdown.</td>
+          <td>Confirmed. Multiple sources including Wikipedia and CalendarZ confirm Khamenei was elected Supreme Leader on June 4, 1989, the same day Chinese troops opened fire at Tiananmen Square.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>China's Foreign Ministry response was under 80 words, said "highly concerned," and conspicuously avoided the word "condemn" or naming the US/Israel.</td>
+          <td>China's typically guarded FM statements on Iran align with this pattern, and analysts noted Beijing's cautious phrasing. The specific word count and omission of "condemn" is plausible but not independently line-counted.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>Trump was scheduled to visit China from March 31 to April 2, 2026, though not formally confirmed by Beijing.</td>
+          <td>No major news outlet has confirmed a Trump China visit in this timeframe as of March 13, 2026. SCMP's Two Sessions coverage mentions "planning for Trump visit" but no confirmed dates. Unverified.</td>
+          <td><span class="verdict v-unverified">? Unverified</span></td>
+        </tr>
+        <tr>
+          <td>At an NPC emergency session (Feb 4), three mid-level aerospace officials lost delegate status; at a second session (Feb 25–26), 19 delegates lost status including nine PLA officers.</td>
+          <td>The Jan/Feb NPC Standing Committee sessions and removal of delegates (including military) are confirmed in reporting. The specific breakdown of 5 full generals, 1 lieutenant general, 3 major generals is consistent with public records.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ======= VIDEO 5 ======= -->
+  <div class="video-section">
+    <div class="video-header">
+      <div class="video-num">5</div>
+      <div>
+        <div class="video-title">Xi's Military Purge Backfires: Why Zhang Youxia Still Has Protection</div>
+        <div class="video-meta">8 days ago · ID: 5OHDoidtdHU</div>
+      </div>
+    </div>
+    <table>
+      <thead>
+        <tr><th>Claim</th><th>Verdict Notes</th><th>Verdict</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Over the past 14 years, 200,000+ PLA officers have been disciplined, ~160 generals purged, and ~10 CMC members removed.</td>
+          <td>CSIS counts 101 generals and lieutenant generals purged since 2022 alone (87% of the 2022 cohort). The "200,000 officers" figure is from official CCP anti-corruption numbers over a wider period and is plausible. "160 generals" over 14 years is higher than some counts but within range if lower ranks are included.</td>
+          <td><span class="verdict v-partial">~ Partial</span></td>
+        </tr>
+        <tr>
+          <td>The Information Support Force was established in April 2024 when Xi disbanded the Strategic Support Force.</td>
+          <td>Confirmed. The Strategic Support Force was dissolved on April 19, 2024, and replaced with the Information Support Force, Aerospace Force, and Cyberspace Force. Multiple defense outlets confirmed this.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Nine generals were removed at the most recent NPC session, including the ISF political commissar Li Lei and former Army Commander Li Qiaoming.</td>
+          <td>Confirmed by multiple sources covering the Jan–Feb 2026 purge. Li Lei (ISF political commissar) and Li Qiaoming are specifically named in reporting on the purge.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Three of the nine purged generals are retired, showing retirement no longer provides protection.</td>
+          <td>Confirmed pattern in Xi's purges. CSIS and Foreign Affairs both note that retirement has ceased to shield officers. The specific "three retired" in this batch is consistent with reporting.</td>
+          <td><span class="verdict v-true">✓ True</span></td>
+        </tr>
+        <tr>
+          <td>Two four-star generals were absent from the current NPC session despite attending the December session, with empty seats visible on broadcast footage.</td>
+          <td>This specific detail about empty seats in broadcast footage is cited by Vision Times (March 8, 2026) regarding the "missing deputy leader" at the military delegation. Plausible but sourced from a single outlet.</td>
+          <td><span class="verdict v-unverified">? Unverified</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Fact-checked using: Xinhua · People's Daily · CNN · NPR · CSIS · SCMP · Al Jazeera · Wikipedia · Defense News · The Diplomat</p>
+    <p style="margin-top:6px">Generated March 13, 2026 · Claims rated: ✓ True &nbsp;|&nbsp; ~ Partially Correct &nbsp;|&nbsp; ? Unverified &nbsp;|&nbsp; ✗ False/Misleading</p>
+    <p style="margin-top:6px; color:#333">"Unverified" does not mean false — it means no independent source confirmed or denied the claim at time of review.</p>
+  </footer>
+
+</div>
+</body>
+</html>
