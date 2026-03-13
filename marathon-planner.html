@@ -161,34 +161,6 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
   <div class="hsub">42.2 KM · METRIC · ALL PACES LINKED VIA RIEGEL · ADJUST ANY PACE TO SYNC EVERYTHING</div>
 </header>
 
-<!-- ① CURRENT FITNESS -->
-<div class="cur-panel">
-  <div style="flex-shrink:0">
-    <div class="cur-heading">YOUR CURRENT PACE</div>
-    <div class="cur-sub">5K → MARATHON · Enter a recent race result</div>
-  </div>
-  <div class="cur-inputs">
-    <select class="cur-select" id="fitDist" onchange="renderAll()">
-      <option value="5">5K</option>
-      <option value="10" selected>10K</option>
-      <option value="21.0975">Half Marathon</option>
-      <option value="42.195">Marathon</option>
-    </select>
-    <div class="cur-time">
-      <div class="cfw"><div class="cfl">HRS</div><input class="cfi" id="fH" type="number" min="0" max="5" value="0" oninput="renderAll()"></div>
-      <span class="csep">:</span>
-      <div class="cfw"><div class="cfl">MIN</div><input class="cfi" id="fM" type="number" min="0" max="59" value="48" oninput="renderAll()"></div>
-      <span class="csep">:</span>
-      <div class="cfw"><div class="cfl">SEC</div><input class="cfi" id="fS" type="number" min="0" max="59" value="0" oninput="renderAll()"></div>
-    </div>
-    <div class="cur-pace-box" id="curPaceBox">
-      <div class="cpb-pace" id="curPaceVal">—</div>
-      <div class="cpb-unit">MIN / KM</div>
-    </div>
-    <div class="gbadge empty" id="gBadge">—</div>
-  </div>
-</div>
-
 <!-- ② TARGET CONTROLS — Time first, Pace second -->
 <div class="controls">
   <div class="ctrl">
@@ -198,18 +170,34 @@ table.st tr:last-child td{border-bottom:none;color:var(--mp);}
       <div class="acol"><button class="ab" onclick="aTM(-1)">▲</button><button class="ab" onclick="aTM(1)">▼</button></div>
     </div>
   </div>
-  <div class="ctrl">
+  <div class="ctrl" style="flex:2.5;min-width:300px;">
     <div class="clbl">Target Marathon Pace</div>
-    <div class="prow">
-      <div>
-        <div class="pnum c-mp" id="mpD">5:30</div>
-        <div class="punit">min / km</div>
-        <div class="cur-mp-sub" id="curMPSub">
-          <span class="cur-mp-label">CURRENT FITNESS</span>
-          <span class="cur-mp-val" id="curMPVal">—</span>
-        </div>
-      </div>
+    <div class="prow" style="margin-bottom:10px;">
+      <div><div class="pnum c-mp" id="mpD">5:30</div><div class="punit">min / km</div></div>
       <div class="acol"><button class="ab" onclick="aMP(-5)">▲</button><button class="ab" onclick="aMP(5)">▼</button></div>
+    </div>
+    <div style="border-top:1px solid var(--bord);padding-top:10px;">
+      <div class="clbl" style="margin-bottom:6px;">YOUR CURRENT PACE · Enter a recent race result</div>
+      <div class="cur-inputs">
+        <select class="cur-select" id="fitDist" onchange="renderAll()">
+          <option value="5">5K</option>
+          <option value="10" selected>10K</option>
+          <option value="21.0975">Half Marathon</option>
+          <option value="42.195">Marathon</option>
+        </select>
+        <div class="cur-time">
+          <div class="cfw"><div class="cfl">HRS</div><input class="cfi" id="fH" type="number" min="0" max="5" value="0" oninput="renderAll()"></div>
+          <span class="csep">:</span>
+          <div class="cfw"><div class="cfl">MIN</div><input class="cfi" id="fM" type="number" min="0" max="59" value="48" oninput="renderAll()"></div>
+          <span class="csep">:</span>
+          <div class="cfw"><div class="cfl">SEC</div><input class="cfi" id="fS" type="number" min="0" max="59" value="0" oninput="renderAll()"></div>
+        </div>
+        <div class="cur-pace-box" id="curPaceBox">
+          <div class="cpb-pace" id="curPaceVal">—</div>
+          <div class="cpb-unit">MIN / KM</div>
+        </div>
+        <div class="gbadge empty" id="gBadge">—</div>
+      </div>
     </div>
   </div>
   <div class="ctrl">
@@ -371,26 +359,20 @@ function renderAll(){
 function updateCurPace(){
   const fit=getFit();
   const box=document.getElementById('curPaceVal');
-  const sub=document.getElementById('curMPSub');
-  const subVal=document.getElementById('curMPVal');
-  if(!fit){box.textContent='—';sub.style.display='none';return;}
+  if(!fit){box.textContent='—';return;}
   const paceSec=fit.tot/fit.dist;
   box.textContent=fmt(paceSec);
-  // Show current predicted marathon pace under target
-  const curMP=rFrom(fit.tot,fit.dist,MA);
-  subVal.textContent=fmt(curMP)+'/km';
-  sub.style.display='block';
 }
 
-// Gap badge: green=any faster than target, red=any slower
+// Gap badge: current - target positive = red (slower), negative = green (faster)
 function updateGap(){
   const fit=getFit(),b=document.getElementById('gBadge');
   if(!fit){b.textContent='—';b.className='gbadge empty';return;}
   const curMP=rFrom(fit.tot,fit.dist,MA);
   const gm=Math.round((curMP-mpSecs)*MA/60);
-  if(gm>0){b.textContent=`${gm} min behind target`;b.className='gbadge behind';}
+  if(gm>0){b.textContent=`${gm} min behind`;b.className='gbadge behind';}
   else if(gm===0){b.textContent='ON TARGET';b.className='gbadge ahead';}
-  else{b.textContent=`${Math.abs(gm)} min ahead`;b.className='gbadge ahead';}
+  else{b.textContent=`${Math.abs(gm)} min faster`;b.className='gbadge ahead';}
 }
 
 // ─── PACE FUNCTIONS ───────────────────────────
