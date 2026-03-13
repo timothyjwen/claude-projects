@@ -628,85 +628,61 @@ function drawOverlay(wIdx,xOfIdx,yOf,easyP,cW,cH,PT){
   h+=`<text x="${((zTL+zTR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(239,68,68,0.35)" letter-spacing="1">TEMPO</text>`;
   h+=`<text x="${((zLL+zLR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(52,211,153,0.35)" letter-spacing="1">LONG RUN</text>`;
 
-  // ── INTERVAL ZONE — distance-accurate sharp spikes ──
-  // Each spike width = repDist in km, recovery width = recDist in km
-  // This makes 400m reps visibly narrow/sharp vs 1km reps
-  const iWarmKm=1.5, iCoolKm=1.0;
-  const iRecKm=iSess.rec;
-  const iTotalKm=iWarmKm+iSess.reps*iSess.dist+(iSess.reps-1)*iRecKm+iCoolKm;
-  const iPxKm=zIW/iTotalKm; // pixels per km in interval zone
+  // ── INTERVAL ZONE ──
+  const IREPS = iSess.reps;
+  const iWarm=zIW*0.12, iCool=zIW*0.08;
+  const repBlock=(zIW-iWarm-iCool)/IREPS;
+  const repDown=repBlock*0.42, repUp=repBlock*0.42, repRec=repBlock*0.16;
 
-  let iPts=[],ix=zIL;
-  iPts.push([ix,easyP]);
-  ix+=iWarmKm*iPxKm; iPts.push([ix,easyP]); // warmup flat
-
-  for(let r=0;r<iSess.reps;r++){
-    const repPx=iSess.dist*iPxKm;
-    const recPx=iRecKm*iPxKm;
-    // Sharp spike: rise to intP at midpoint, back to easyP
-    iPts.push([ix,easyP]);
-    iPts.push([ix+repPx*0.5,intP]); // spike tip — SHARP
-    iPts.push([ix+repPx,easyP]);
-    ix+=repPx;
-    if(r<iSess.reps-1){
+  {
+    let iPts=[],ix=zIL;
+    iPts.push([ix,easyP]); ix+=iWarm; iPts.push([ix,easyP]);
+    for(let r=0;r<IREPS;r++){
       iPts.push([ix,easyP]);
-      ix+=recPx;
-      iPts.push([ix,easyP]);
+      iPts.push([ix+repDown,intP]);
+      iPts.push([ix+repDown+repUp,easyP]);
+      ix+=repDown+repUp+repRec;
+      if(r<IREPS-1)iPts.push([ix,easyP]);
     }
+    iPts.push([ix,easyP]); ix+=iCool; iPts.push([ix,easyP]);
+    h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+    const iVtipX=zIL+iWarm+repDown;
+    h+=`<text x="${iVtipX.toFixed(1)}" y="${(yOf(intP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km</text>`;
   }
-  ix+=iCoolKm*iPxKm; iPts.push([ix,easyP]);
 
-  h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.9)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>`;
-  // Label at first spike tip
-  const firstTipX=zIL+iWarmKm*iPxKm+iSess.dist*iPxKm*0.5;
-  h+=`<text x="${firstTipX.toFixed(1)}" y="${(yOf(intP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km</text>`;
-
-  // ── TEMPO ZONE — distance-accurate blocks ──
-  // 4min on at 5:00/km = 1.25km wide block. 3min off = 0.75km recovery gap.
-  // Block widths are proportional to actual km run, not arbitrary fractions.
-  const tWarmKm=1.5, tCoolKm=1.0;
-  const tRecKm=tSess.type==='CONTINUOUS'?0:Math.max(0.5,tSess.dist*0.5);
-  const tTotalKm=tWarmKm+(tSess.type==='CONTINUOUS'
-    ?tSess.dist
-    :tSess.reps*tSess.dist+(tSess.reps-1)*tRecKm)+tCoolKm;
-  const tPxKm=zTW/tTotalKm;
-
-  let tPts=[],tx=zTL;
-  tPts.push([tx,easyP]);
-  tx+=tWarmKm*tPxKm; tPts.push([tx,easyP]);
-
+  // ── TEMPO ZONE ──
   if(tSess.type==='CONTINUOUS'){
-    const repPx=tSess.dist*tPxKm;
-    tPts.push([tx,easyP],[tx,tmpP]);
-    tx+=repPx;
-    tPts.push([tx,tmpP],[tx,easyP]);
+    const tAvail=zTW*0.76, tStartX=zTL+zTW*0.12, tEndX=zTL+zTW*0.12+tAvail;
+    h+=`<polyline points="${zTL.toFixed(1)},${yOf(easyP).toFixed(1)} ${tStartX.toFixed(1)},${yOf(easyP).toFixed(1)} ${tStartX.toFixed(1)},${yOf(tmpP).toFixed(1)} ${tEndX.toFixed(1)},${yOf(tmpP).toFixed(1)} ${tEndX.toFixed(1)},${yOf(easyP).toFixed(1)} ${(zTL+zTW).toFixed(1)},${yOf(easyP).toFixed(1)}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    h+=`<text x="${((tStartX+tEndX)/2).toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
   } else if(tSess.type==='OVER/UNDER'){
-    // Alternating above/below threshold — over/under mile reps
-    const overP=tmpP*0.98, underP=tmpP*1.025;
-    for(let r=0;r<tSess.reps;r++){
-      const repPx=tSess.dist*tPxKm;
-      const recPx=tRecKm*tPxKm;
+    const TREPS=tSess.reps, overP=tmpP*0.98, underP=tmpP*1.02;
+    const tWarm=zTW*0.12, tCool=zTW*0.10, tAvail=zTW-zTW*0.12-zTW*0.10;
+    const repW=tAvail/TREPS;
+    let tPts=[],tx=zTL;
+    tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
+    for(let r=0;r<TREPS;r++){
       const p=r%2===0?overP:underP;
-      tPts.push([tx,easyP],[tx,p]);
-      tx+=repPx;
-      tPts.push([tx,p],[tx,easyP]);
-      if(r<tSess.reps-1){tx+=recPx; tPts.push([tx,easyP]);}
+      tPts.push([tx,easyP],[tx,p]); tx+=repW; tPts.push([tx,p],[tx,easyP]);
     }
+    tx+=tCool; tPts.push([tx,easyP]);
+    h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    h+=`<text x="${(zTL+zTW/2).toFixed(1)}" y="${(yOf(overP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km O/U</text>`;
   } else {
-    for(let r=0;r<tSess.reps;r++){
-      const repPx=tSess.dist*tPxKm;
-      const recPx=tRecKm*tPxKm;
-      tPts.push([tx,easyP],[tx,tmpP]);
-      tx+=repPx;
-      tPts.push([tx,tmpP],[tx,easyP]);
-      if(r<tSess.reps-1){tx+=recPx; tPts.push([tx,easyP]);}
+    const TREPS=tSess.reps, tWarm=zTW*0.12, tCool=zTW*0.10, tAvail=zTW-zTW*0.12-zTW*0.10;
+    const tRep=tAvail/(TREPS*1.8), tRec=tRep*0.8;
+    const tScale=tAvail/(TREPS*tRep+(TREPS-1)*tRec);
+    const tRep2=tRep*tScale, tRec2=tRec*tScale;
+    let tPts=[],tx=zTL;
+    tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
+    for(let r=0;r<TREPS;r++){
+      tPts.push([tx,easyP],[tx,tmpP]); tx+=tRep2; tPts.push([tx,tmpP],[tx,easyP]);
+      if(r<TREPS-1){tx+=tRec2; tPts.push([tx,easyP]);}
     }
+    tx+=tCool; tPts.push([tx,easyP]);
+    h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    h+=`<text x="${(zTL+tWarm+tRep2/2).toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
   }
-  tx+=tCoolKm*tPxKm; tPts.push([tx,easyP]);
-
-  h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.85)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
-  const tLabelX=zTL+tWarmKm*tPxKm+tSess.dist*tPxKm*0.5;
-  h+=`<text x="${tLabelX.toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
 
   // ── LONG RUN ──
   // Research: easy at current pace + 60s/km, finish with MP section
