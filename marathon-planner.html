@@ -382,15 +382,15 @@ function updateCurPace(){
   sub.style.display='block';
 }
 
-// Gap badge: red=slower than target, green=17+ min faster, orange=closing
+// Gap badge: green=any faster than target, red=any slower
 function updateGap(){
   const fit=getFit(),b=document.getElementById('gBadge');
   if(!fit){b.textContent='—';b.className='gbadge empty';return;}
   const curMP=rFrom(fit.tot,fit.dist,MA);
   const gm=Math.round((curMP-mpSecs)*MA/60);
   if(gm>0){b.textContent=`${gm} min behind target`;b.className='gbadge behind';}
-  else if(Math.abs(gm)>=17){b.textContent=`${Math.abs(gm)} min ahead ✓`;b.className='gbadge ahead';}
-  else{b.textContent=`${Math.abs(gm)} min to close`;b.className='gbadge closing';}
+  else if(gm===0){b.textContent='ON TARGET';b.className='gbadge ahead';}
+  else{b.textContent=`${Math.abs(gm)} min ahead`;b.className='gbadge ahead';}
 }
 
 // ─── PACE FUNCTIONS ───────────────────────────
