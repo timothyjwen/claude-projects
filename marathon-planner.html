@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marathon Training Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:wght@300;400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#09090b;--surf:#101014;--surf2:#16161c;--bord:#1e1e2c;
+  --easy:#3b82f6;--tempo:#ef4444;--mp:#f97316;--hm:#a78bfa;
+  --int:#facc15;--long:#34d399;--muted:#42425a;--text:#e4e4f0;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;opacity:.28;pointer-events:none;z-index:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");}
+
+header{padding:22px 36px 14px;border-bottom:1px solid var(--bord);}
+.htag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--mp);margin-bottom:3px;}
+h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,5vw,66px);letter-spacing:2px;line-height:.88;}
+h1 em{color:var(--mp);font-style:normal;}
+.hsub{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);margin-top:5px;letter-spacing:1px;}
+
+/* CURRENT PACE PANEL */
+.cur-panel{background:var(--surf2);border-bottom:1px solid var(--bord);padding:14px 28px;display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+.cur-heading{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:2px;color:var(--easy);}
+.cur-sub{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+.cur-inputs{display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap;}
+.cur-select{background:var(--surf);border:1px solid var(--bord);color:var(--easy);font-family:'DM Mono',monospace;font-size:11px;padding:8px 10px;outline:none;cursor:pointer;height:46px;}
+.cur-select option{background:var(--surf);}
+.cur-time{display:flex;align-items:flex-end;gap:2px;}
+.cfw{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.cfl{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:1.5px;}
+.cfi{width:56px;background:var(--surf);border:1px solid var(--bord);color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:27px;text-align:center;outline:none;padding:5px 2px;line-height:1;height:46px;}
+.cfi:focus{border-color:var(--easy);color:var(--easy);}
+.csep{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--muted);padding-bottom:10px;}
+/* current pace min/km badge */
+.cur-pace-box{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:var(--surf);border:1px solid var(--easy);height:46px;padding:0 14px;min-width:80px;}
+.cpb-pace{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--easy);line-height:1;}
+.cpb-unit{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);letter-spacing:1px;margin-top:2px;}
+/* gap badge */
+.gbadge{font-family:'DM Mono',monospace;font-size:9px;padding:0 12px;letter-spacing:1px;white-space:nowrap;height:46px;display:flex;align-items:center;border:1px solid var(--bord);}
+.gbadge.behind{background:rgba(239,68,68,.1);color:#ef4444;border-color:rgba(239,68,68,.25);}
+.gbadge.ahead{background:rgba(59,130,246,.1);color:#3b82f6;border-color:rgba(59,130,246,.25);}
+.gbadge.ontrack{background:rgba(34,197,94,.1);color:#22c55e;border-color:rgba(34,197,94,.25);}
+.gbadge.empty{color:var(--muted);}
+
+/* CONTROLS */
+.controls{display:flex;flex-wrap:wrap;gap:1px;background:var(--bord);border-bottom:1px solid var(--bord);}
+.ctrl{background:var(--surf);padding:13px 18px;flex:1;min-width:130px;}
+.ctrl:hover{background:var(--surf2);}
+.clbl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;}
+.prow{display:flex;align-items:center;gap:6px;}
+.pnum{font-family:'Bebas Neue',sans-serif;font-size:28px;line-height:1;min-width:64px;}
+.punit{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);line-height:1.9;}
+.acol{display:flex;flex-direction:column;gap:2px;margin-left:auto;}
+.ab{width:20px;height:20px;background:var(--surf2);border:1px solid var(--bord);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:8px;transition:all .1s;user-select:none;}
+.ab:hover{background:var(--mp);border-color:var(--mp);color:#fff;}
+.ab:active{transform:scale(.85);}
+.dbig{font-family:'Bebas Neue',sans-serif;font-size:27px;line-height:1;}
+.c-mp{color:var(--mp);}.c-easy{color:var(--easy);}.c-tempo{color:var(--tempo);}.c-hm{color:var(--hm);}.c-spd{color:var(--int);}
+.wrow{display:flex;align-items:center;gap:8px;margin-top:1px;}
+.wbig{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--mp);min-width:28px;line-height:1;}
+input[type=range]{-webkit-appearance:none;height:2px;background:var(--bord);outline:none;cursor:pointer;width:80px;}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;background:var(--mp);cursor:pointer;border-radius:50%;}
+
+/* CHART */
+.chart-section{padding:18px 32px 0;position:relative;z-index:1;}
+.chart-title{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:1px;}
+.chart-sub{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1px;margin-bottom:10px;}
+.wk-strip{background:var(--surf2);border:1px solid var(--bord);border-bottom:none;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.wsl{font-family:'DM Mono',monospace;font-size:7.5px;letter-spacing:2px;color:var(--muted);white-space:nowrap;text-transform:uppercase;}
+.wsr{display:flex;align-items:center;gap:8px;flex:1;min-width:180px;}
+#wkOvr{width:100%;max-width:280px;margin:0;}
+.wse{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);white-space:nowrap;}
+.wstags{display:flex;gap:10px;flex-wrap:wrap;}
+.wtag{font-family:'DM Mono',monospace;font-size:8px;padding:3px 9px;letter-spacing:1px;}
+.wtag.wn{color:var(--text);border:1px solid var(--bord);}
+.wtag.wi{color:var(--int);border:1px solid rgba(250,204,21,.2);background:rgba(250,204,21,.05);}
+.wtag.wt{color:var(--tempo);border:1px solid rgba(239,68,68,.2);background:rgba(239,68,68,.05);}
+.wtag.wl{color:var(--long);border:1px solid rgba(52,211,153,.2);background:rgba(52,211,153,.05);}
+.cleg-bar{background:var(--surf);border:1px solid var(--bord);border-bottom:none;padding:7px 14px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;}
+.cleg{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1px;white-space:nowrap;}
+.cl{width:22px;height:2px;}
+.chart-outer{background:var(--surf);border:1px solid var(--bord);padding:16px 10px 56px 54px;position:relative;overflow:hidden;}
+#cSvg{display:block;width:100%;overflow:visible;}
+.ctt{position:absolute;background:#1c1c28;border:1px solid #2a2a3c;font-family:'DM Mono',monospace;font-size:10px;padding:8px 12px;pointer-events:none;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:30;line-height:1.8;}
+.ttd{font-size:7.5px;color:var(--muted);letter-spacing:1px;}
+.ttt{color:var(--mp);}.ttc{color:var(--easy);}
+
+/* LEGEND */
+.legend{display:flex;gap:12px;padding:7px 24px;background:var(--surf);border-top:1px solid var(--bord);border-bottom:1px solid var(--bord);flex-wrap:wrap;align-items:center;margin-top:16px;}
+.leg{display:flex;align-items:center;gap:5px;font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:1px;white-space:nowrap;}
+.lb{width:19px;height:3px;border-radius:1px;}
+
+/* PLAN */
+.plan{padding:12px 36px 0;position:relative;z-index:1;}
+.plbl{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:4px;color:var(--muted);text-transform:uppercase;padding:10px 0 3px;opacity:.45;}
+.wk{display:grid;grid-template-columns:54px 1fr;gap:8px;align-items:stretch;margin-bottom:2px;opacity:0;animation:fu .3s forwards;}
+@keyframes fu{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.wlbl{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);display:flex;flex-direction:column;justify-content:center;border-right:1px solid var(--bord);padding-right:6px;}
+.wlbl strong{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--text);line-height:1;}
+.wlbl.rec strong{color:var(--muted);}
+.rtag{font-size:6px;letter-spacing:1px;color:#2563eb;margin-top:1px;}
+.wcontent{display:flex;flex-direction:column;gap:4px;padding:3px 0;}
+.run-bars{display:flex;flex-direction:column;gap:2px;}
+.rrow{display:flex;align-items:center;gap:7px;}
+.rtype{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:54px;flex-shrink:0;text-transform:uppercase;}
+.bwrap{flex:1;height:8px;display:flex;align-items:center;}
+.segs{display:flex;height:100%;gap:1px;}
+.seg{height:100%;flex-shrink:0;border-radius:1px;min-width:2px;}
+.seg.easy{background:repeating-linear-gradient(90deg,var(--easy) 0,var(--easy) 5px,rgba(59,130,246,.1) 5px,rgba(59,130,246,.1) 9px);}
+.seg.tempo{opacity:.95;}
+.seg.marathon{background:var(--mp);}
+.rdist{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);width:34px;text-align:right;flex-shrink:0;}
+.conv-row{display:flex;align-items:center;gap:7px;}
+.cv-lbl{font-family:'DM Mono',monospace;font-size:6.5px;color:var(--muted);letter-spacing:1px;width:54px;flex-shrink:0;text-transform:uppercase;}
+.cv-out{flex:1;position:relative;}
+.cv-track{width:100%;height:3px;background:var(--bord);border-radius:2px;position:relative;}
+.cv-fill{height:100%;border-radius:2px;position:absolute;left:0;top:0;}
+.cv-tgt{position:absolute;top:-4px;width:2px;height:11px;background:var(--mp);border-radius:1px;}
+.cv-dot{width:9px;height:9px;border-radius:50%;position:absolute;top:-3px;transform:translateX(-50%);border:1.5px solid var(--bg);}
+.cv-ends{display:flex;justify-content:space-between;margin-top:5px;}
+.cv-end{font-family:'DM Mono',monospace;font-size:6px;color:#252535;letter-spacing:1px;}
+.cv-pace{font-family:'DM Mono',monospace;font-size:8px;min-width:42px;text-align:right;flex-shrink:0;}
+.raceday{padding:18px 0 0;margin-top:14px;border-top:1px solid #1c1208;}
+.rd-top{display:grid;grid-template-columns:54px 1fr;gap:8px;align-items:center;}
+.rdlbl{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--mp);letter-spacing:2px;line-height:1;}
+.rdbar{height:13px;background:linear-gradient(90deg,var(--mp),#facc15);border-radius:2px;position:relative;overflow:hidden;}
+.rdshine{position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);animation:shine 2s ease-in-out infinite;}
+@keyframes shine{from{transform:translateX(-100%);}to{transform:translateX(220%);}}
+.rdinfo{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);margin-top:3px;letter-spacing:1px;}
+.splits-wrap{margin-top:24px;padding-bottom:60px;}
+.stitle{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:3px;margin-bottom:2px;}
+.ssub{font-family:'DM Mono',monospace;font-size:7.5px;color:var(--muted);letter-spacing:2px;margin-bottom:10px;}
+table.st{width:100%;border-collapse:collapse;}
+table.st th{font-family:'DM Mono',monospace;font-size:7px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;padding:6px 9px;text-align:left;border-bottom:1px solid var(--bord);}
+table.st td{font-family:'DM Mono',monospace;font-size:10px;color:var(--text);padding:6px 9px;border-bottom:1px solid var(--bord);}
+table.st tr:last-child td{border-bottom:none;color:var(--mp);}
+.skm{font-family:'Bebas Neue',sans-serif;font-size:15px;line-height:1;}
+.sbarcell{width:52%;}
+.sbarw{height:4px;background:var(--surf2);border-radius:1px;overflow:hidden;}
+.sbarf{height:100%;background:linear-gradient(90deg,var(--mp),#facc15);}
+.spct{font-family:'DM Mono',monospace;font-size:6px;color:var(--muted);margin-top:2px;letter-spacing:1px;}
+.hlrow td{background:rgba(249,115,22,.05);}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--bord);}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="htag">&#9632; Riegel Formula Training System</div>
+  <h1>MARATHON <em>PLANNER</em></h1>
+  <div class="hsub">42.2 KM · METRIC · ALL PACES LINKED VIA RIEGEL · ADJUST ANY PACE TO SYNC EVERYTHING</div>
+</header>
+
+<!-- ① CURRENT FITNESS -->
+<div class="cur-panel">
+  <div style="flex-shrink:0">
+    <div class="cur-heading">YOUR CURRENT PACE</div>
+    <div class="cur-sub">5K → MARATHON · Enter a recent race result</div>
+  </div>
+  <div class="cur-inputs">
+    <select class="cur-select" id="fitDist" onchange="renderAll()">
+      <option value="5">5K</option>
+      <option value="10" selected>10K</option>
+      <option value="21.0975">Half Marathon</option>
+      <option value="42.195">Marathon</option>
+    </select>
+    <div class="cur-time">
+      <div class="cfw"><div class="cfl">HRS</div><input class="cfi" id="fH" type="number" min="0" max="5" value="0" oninput="renderAll()"></div>
+      <span class="csep">:</span>
+      <div class="cfw"><div class="cfl">MIN</div><input class="cfi" id="fM" type="number" min="0" max="59" value="48" oninput="renderAll()"></div>
+      <span class="csep">:</span>
+      <div class="cfw"><div class="cfl">SEC</div><input class="cfi" id="fS" type="number" min="0" max="59" value="0" oninput="renderAll()"></div>
+    </div>
+    <!-- Current min/km badge -->
+    <div class="cur-pace-box" id="curPaceBox">
+      <div class="cpb-pace" id="curPaceVal">—</div>
+      <div class="cpb-unit">MIN / KM</div>
+    </div>
+    <div class="gbadge empty" id="gBadge">—</div>
+  </div>
+</div>
+
+<!-- ② TARGET CONTROLS -->
+<div class="controls">
+  <div class="ctrl">
+    <div class="clbl">Target Marathon Pace</div>
+    <div class="prow">
+      <div><div class="pnum c-mp" id="mpD">5:30</div><div class="punit">min / km</div></div>
+      <div class="acol"><button class="ab" onclick="aMP(-5)">▲</button><button class="ab" onclick="aMP(5)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Target Finish Time</div>
+    <div class="prow">
+      <div><div class="pnum" id="tmD">3:51</div><div class="punit">hr : min</div></div>
+      <div class="acol"><button class="ab" onclick="aTM(-1)">▲</button><button class="ab" onclick="aTM(1)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Race Pace — 5K</div>
+    <div class="prow">
+      <div><div class="dbig c-easy" id="fkD">—</div><div class="punit">min / km</div></div>
+      <div class="acol"><button class="ab" onclick="aFK(-5)">▲</button><button class="ab" onclick="aFK(5)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Tempo Pace — 10K</div>
+    <div class="prow">
+      <div><div class="dbig c-tempo" id="tpD">—</div><div class="punit">min / km</div></div>
+      <div class="acol"><button class="ab" onclick="aTP(-5)">▲</button><button class="ab" onclick="aTP(5)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Half Marathon</div>
+    <div class="prow">
+      <div><div class="dbig c-hm" id="hmD">—</div><div class="punit">min / km</div></div>
+      <div class="acol"><button class="ab" onclick="aHM(-5)">▲</button><button class="ab" onclick="aHM(5)">▼</button></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Training Weeks</div>
+    <div class="wrow">
+      <div class="wbig" id="wkD">16</div>
+      <div><input type="range" id="wkS" min="12" max="20" value="16" oninput="aWK(this.value)"><div class="punit">12 → 20 wks</div></div>
+    </div>
+  </div>
+  <div class="ctrl">
+    <div class="clbl">Speed</div>
+    <div class="dbig c-spd" id="spdD">10.9</div>
+    <div class="punit" style="margin-top:4px">km / hour</div>
+  </div>
+</div>
+
+<!-- ③ CHART -->
+<div class="chart-section">
+  <div class="chart-title">PREDICTED PACE CURVE</div>
+  <div class="chart-sub">RIEGEL FORMULA · Y AXIS: TOP = FASTEST · HOVER FOR SPLIT TIMES · WEEK OVERLAY SHOWS TRAINING ZONES</div>
+
+  <div class="wk-strip">
+    <span class="wsl">Week Overlay</span>
+    <div class="wsr">
+      <span class="wse">Wk 1</span>
+      <input type="range" id="wkOvr" min="0" max="15" value="0" oninput="updateOverlay(+this.value)">
+      <span class="wse">Wk <span id="wkOvrMax">16</span></span>
+    </div>
+    <div class="wstags">
+      <span class="wtag wn" id="wosWk">WEEK 1</span>
+      <span class="wtag wi" id="wosI">Interval: —</span>
+      <span class="wtag wt" id="wosT">Tempo: —</span>
+      <span class="wtag wl" id="wosL">Long: —</span>
+    </div>
+  </div>
+
+  <div class="cleg-bar">
+    <div class="cleg">
+      <svg width="28" height="10"><line x1="0" y1="5" x2="28" y2="5" stroke="#f97316" stroke-width="2.5" stroke-dasharray="7 4"/></svg>
+      TARGET PACE</div>
+    <div class="cleg"><div class="cl" style="background:repeating-linear-gradient(90deg,#3b82f6 0,#3b82f6 4px,transparent 4px,transparent 8px);height:2px"></div>CURRENT FITNESS</div>
+    <div class="cleg"><div class="cl" style="background:rgba(239,68,68,.2);height:8px;border-radius:1px"></div>GAP</div>
+    <div class="cleg" style="margin-left:8px"><div class="cl" style="background:var(--int);height:2px"></div>INTERVAL ∨∨∨ → 5K</div>
+    <div class="cleg"><div class="cl" style="background:var(--tempo);height:2px"></div>TEMPO ⎽|‾|⎽ → 10K</div>
+    <div class="cleg"><div class="cl" style="background:var(--long);height:2px"></div>LONG RUN ——● → MP</div>
+  </div>
+
+  <div class="chart-outer" id="chartOuter">
+    <div class="ctt" id="ctt">
+      <div class="ttd" id="cttD"></div>
+      <div class="ttt" id="cttT"></div>
+      <div class="ttc" id="cttC"></div>
+    </div>
+    <svg id="cSvg" height="320"></svg>
+  </div>
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="leg"><div class="lb" style="background:repeating-linear-gradient(90deg,#3b82f6 0,#3b82f6 5px,rgba(59,130,246,.1) 5px,rgba(59,130,246,.1) 9px)"></div>EASY</div>
+  <div class="leg"><div class="lb" style="background:var(--tempo)"></div>TEMPO (intensity builds →)</div>
+  <div class="leg"><div class="lb" style="background:var(--mp)"></div>MARATHON PACE</div>
+  <div class="leg"><div class="lb" style="background:linear-gradient(90deg,var(--mp),#facc15)"></div>RACE DAY</div>
+  <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:7px;color:#222230;letter-spacing:1px;">BAR WIDTH = DISTANCE</span>
+</div>
+
+<div class="plan" id="plan"></div>
+
+<script>
+// ─── CONSTANTS ───────────────────────────────
+const MA = 42.195;
+// Evenly-spaced x checkpoints (index 0 = km 0 used only for axis, not Riegel)
+const CDISTS = [0, 1, 3, 5, 10, 15, 20, 21.0975, 42.195];
+const CLBLS  = ['0','1','3','5','10','15','20','21','42.2'];
+const CN = CDISTS.length;
+
+// Riegel data points start from index 1 (km 1), target doesn't go to zero
+const RIEGEL_START = 1; // index into CDISTS
+
+// ─── STATE ───────────────────────────────────
+let mpSecs   = 5*60+30;
+let timeMins = 3*60+51;
+let weeks    = 16;
+let wkOvr    = 0;
+
+// ─── RIEGEL ──────────────────────────────────
+const rAtD  = d => mpSecs * Math.pow(d / MA, 0.06);
+const rFrom = (tot,d1,d2) => (tot/d1) * Math.pow(d2/d1, 0.06);
+const mpFromPaceAt = (ps,d) => ps / Math.pow(d/MA, 0.06);
+const calcHM  = () => Math.round(rAtD(21.0975));
+const calcTP  = () => Math.round(rAtD(10));
+const calc5K  = () => Math.round(rAtD(5));
+
+// ─── FORMAT ──────────────────────────────────
+const fmt = s=>{const v=Math.max(0,Math.round(s));return `${Math.floor(v/60)}:${(v%60).toString().padStart(2,'0')}`;};
+const fmtT= m=>`${Math.floor(m/60)}:${(m%60).toString().padStart(2,'0')}`;
+const fmtTot=(ps,d)=>{const t=ps*d,h=Math.floor(t/3600),m=Math.floor((t%3600)/60),s=Math.round(t%60);return h?`${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`:`${m}:${s.toString().padStart(2,'0')}`;};
+const fmtE=s=>{const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sc=Math.round(s%60);return h?`${h}:${m.toString().padStart(2,'0')}:${sc.toString().padStart(2,'0')}`:`${m}:${sc.toString().padStart(2,'0')}`;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+// ─── CONTROLS ────────────────────────────────
+function aMP(d){mpSecs=clamp(mpSecs+d,3*60,9*60);timeMins=Math.round(mpSecs*MA/60);renderAll();}
+function aTM(d){timeMins=clamp(timeMins+d,2*60+20,6*60);mpSecs=Math.round(timeMins*60/MA);renderAll();}
+function aFK(d){mpSecs=clamp(Math.round(mpFromPaceAt(calc5K()+d,5)),3*60,9*60);timeMins=Math.round(mpSecs*MA/60);renderAll();}
+function aTP(d){mpSecs=clamp(Math.round(mpFromPaceAt(calcTP()+d,10)),3*60,9*60);timeMins=Math.round(mpSecs*MA/60);renderAll();}
+function aHM(d){mpSecs=clamp(Math.round(mpFromPaceAt(calcHM()+d,21.0975)),3*60,9*60);timeMins=Math.round(mpSecs*MA/60);renderAll();}
+function aWK(v){
+  weeks=parseInt(v);
+  document.getElementById('wkD').textContent=weeks;
+  document.getElementById('wkOvrMax').textContent=weeks;
+  document.getElementById('wkOvr').max=weeks-1;
+  if(wkOvr>=weeks)wkOvr=weeks-1;
+  renderAll();
+}
+function updateOverlay(v){wkOvr=v;drawChart();updateTags();}
+
+function getFit(){
+  const dist=parseFloat(document.getElementById('fitDist').value);
+  const h=parseInt(document.getElementById('fH').value)||0;
+  const m=parseInt(document.getElementById('fM').value)||0;
+  const s=parseInt(document.getElementById('fS').value)||0;
+  const tot=h*3600+m*60+s;
+  return tot>0?{dist,tot}:null;
+}
+
+// ─── RENDER ALL ───────────────────────────────
+function renderAll(){
+  document.getElementById('mpD').textContent  = fmt(mpSecs);
+  document.getElementById('tmD').textContent  = fmtT(timeMins);
+  document.getElementById('fkD').textContent  = fmt(calc5K());
+  document.getElementById('tpD').textContent  = fmt(calcTP());
+  document.getElementById('hmD').textContent  = fmt(calcHM());
+  document.getElementById('spdD').textContent = (3600/mpSecs).toFixed(1);
+  updateCurPace();
+  updateGap();
+  drawChart();
+  updateTags();
+  buildPlan();
+}
+
+// Show current min/km derived from fitness input
+function updateCurPace(){
+  const fit=getFit();
+  const box=document.getElementById('curPaceVal');
+  if(!fit){box.textContent='—';return;}
+  // Show pace at the selected distance (their per-km pace for that event)
+  const paceSec=fit.tot/fit.dist;
+  box.textContent=fmt(paceSec);
+}
+
+function updateGap(){
+  const fit=getFit(),b=document.getElementById('gBadge');
+  if(!fit){b.textContent='—';b.className='gbadge empty';return;}
+  const curMP=rFrom(fit.tot,fit.dist,MA);
+  const gm=Math.round((curMP-mpSecs)*MA/60);
+  if(Math.abs(gm)<2){b.textContent='✓ ON TARGET';b.className='gbadge ontrack';}
+  else if(gm>0){b.textContent=`${gm} min behind target`;b.className='gbadge behind';}
+  else{b.textContent=`${Math.abs(gm)} min ahead`;b.className='gbadge ahead';}
+}
+
+// ─── WEEK PACE CONVERGENCE ───────────────────
+function wIntPace(w){
+  const tp=weeks-3,target=rAtD(5),fit=getFit();
+  const start=fit?rFrom(fit.tot,fit.dist,5):target*1.20;
+  return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
+}
+function wTmpPace(w){
+  const tp=weeks-3,target=rAtD(10),fit=getFit();
+  const start=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
+  return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
+}
+function wLongPace(w){
+  const tp=weeks-3,target=mpSecs,fit=getFit();
+  const start=fit?rFrom(fit.tot,fit.dist,MA):target*1.10;
+  return start+(target-start)*Math.pow(clamp(w/Math.max(tp-1,1),0,1),.70);
+}
+const wEasyP=()=>mpSecs*1.24;
+
+function updateTags(){
+  const w=wkOvr,tp=weeks-3;
+  const phase=w<Math.floor(weeks*.44)?'BASE':w<tp?'BUILD':'TAPER';
+  const prog=clamp(w/Math.max(tp-1,1),0,1);
+  const lkm=getLongKm(w,weeks);
+  const treps=Math.round(2+prog*2);
+  const tkm=(1+prog*1.5).toFixed(1);
+  const ireps=4,ikm=(0.4+prog*0.5).toFixed(1);
+  document.getElementById('wosWk').textContent=`WEEK ${w+1} · ${phase}`;
+  document.getElementById('wosI').textContent=`Interval: ${ireps}×${ikm}km @ ${fmt(wIntPace(w))}`;
+  document.getElementById('wosT').textContent=`Tempo: ${treps}×${tkm}km @ ${fmt(wTmpPace(w))}`;
+  document.getElementById('wosL').textContent=`Long: ${lkm}km @ ${fmt(wLongPace(w))} MP`;
+}
+
+// ─── CHART ───────────────────────────────────
+function drawChart(){
+  const svg=document.getElementById('cSvg');
+  const outer=document.getElementById('chartOuter');
+  const W=svg.clientWidth||(outer.clientWidth-64)||700;
+  const H=320,PT=18,PB=56,cH=H-PT-PB,cW=W;
+
+  // X: evenly spaced by index
+  const xOfIdx = i => (i/(CN-1))*cW;
+
+  const easyP=wEasyP(),fit=getFit();
+
+  // Riegel paces — only for CDISTS[RIEGEL_START..] (km 1 onwards), NOT km 0
+  const tPaces=CDISTS.map((d,i)=>i<RIEGEL_START?null:rAtD(d));
+  const cPaces=fit?CDISTS.map((d,i)=>i<RIEGEL_START?null:rFrom(fit.tot,fit.dist,d)):null;
+
+  // Y range from all real paces + overlay paces
+  const realTP=tPaces.filter(p=>p!==null);
+  const realCP=cPaces?cPaces.filter(p=>p!==null):[];
+  const allP=[...realTP,...realCP,easyP,wIntPace(wkOvr)*0.96];
+  const minP=Math.min(...allP)*0.970; // fastest pace value → top of chart
+  const maxP=Math.max(...allP)*1.032; // slowest pace value → bottom of chart
+
+  // ── INVERTED Y: fast (low pace number) = TOP (small svg y) ──
+  // When p is small (fast): (p-minP) is small → y is small → near top ✓
+  // When p is large (slow): (p-minP) is large → y is large → near bottom ✓
+  const yOf = p => PT + ((p - minP) / (maxP - minP)) * cH;
+
+  let h='';
+
+  // Y gridlines — label them, note fast is at top
+  for(let i=0;i<=5;i++){
+    const p=minP+(i/5)*(maxP-minP);
+    const y=yOf(p);
+    h+=`<line x1="0" y1="${y.toFixed(1)}" x2="${cW}" y2="${y.toFixed(1)}" stroke="#141420" stroke-width="1"/>`;
+    h+=`<text x="-6" y="${(y+4).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="8.5" fill="#2e2e46">${fmt(p)}</text>`;
+  }
+  // "FAST" / "SLOW" axis labels
+  h+=`<text x="-6" y="${(PT+6).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="6.5" fill="#3a3a56" letter-spacing="1">FAST ↑</text>`;
+  h+=`<text x="-6" y="${(PT+cH+2).toFixed(1)}" text-anchor="end" font-family="DM Mono,monospace" font-size="6.5" fill="#3a3a56" letter-spacing="1">SLOW ↓</text>`;
+
+  // X ticks
+  CDISTS.forEach((d,i)=>{
+    const x=xOfIdx(i);
+    h+=`<line x1="${x.toFixed(1)}" y1="${PT}" x2="${x.toFixed(1)}" y2="${(PT+cH).toFixed(1)}" stroke="#111118" stroke-width="1" stroke-dasharray="2 5"/>`;
+    h+=`<text x="${x.toFixed(1)}" y="${(PT+cH+13).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8.5" fill="#2e2e46">${CLBLS[i]}</text>`;
+  });
+  h+=`<line x1="0" y1="${(PT+cH).toFixed(1)}" x2="${cW}" y2="${(PT+cH).toFixed(1)}" stroke="#1c1c2c" stroke-width="1"/>`;
+  h+=`<text x="${(cW/2).toFixed(0)}" y="${(PT+cH+28).toFixed(0)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">DISTANCE (KM)</text>`;
+  h+=`<text transform="rotate(-90)" x="${-(PT+cH/2).toFixed(0)}" y="-40" text-anchor="middle" font-family="DM Mono,monospace" font-size="7.5" fill="#22223a" letter-spacing="2">PACE (MIN/KM)</text>`;
+
+  // ── WEEK TRAINING OVERLAY ──
+  h+=drawOverlay(wkOvr,xOfIdx,yOf,easyP,cW,cH,PT);
+
+  // ── GAP POLYGON (between current and target, km1 onwards) ──
+  if(cPaces){
+    const fw=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(cPaces[i]).toFixed(1)}`).filter(Boolean);
+    const bk=CDISTS.map((_,i)=>{const ri=CN-1-i;return ri<RIEGEL_START?null:`${xOfIdx(ri).toFixed(1)},${yOf(tPaces[ri]).toFixed(1)}`;}).filter(Boolean);
+    h+=`<polygon points="${[...fw,...bk].join(' ')}" fill="rgba(239,68,68,0.07)" stroke="none"/>`;
+  }
+
+  // ── CURRENT FITNESS CURVE (km1 onwards, dashed blue) ──
+  if(cPaces){
+    const pts=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(cPaces[i]).toFixed(1)}`).filter(Boolean).join(' ');
+    h+=`<polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>`;
+    CDISTS.forEach((_,i)=>{
+      if(i<RIEGEL_START)return;
+      h+=`<circle cx="${xOfIdx(i).toFixed(1)}" cy="${yOf(cPaces[i]).toFixed(1)}" r="3.5" fill="#3b82f6" stroke="#09090b" stroke-width="1.5"/>`;
+    });
+  }
+
+  // ── TARGET PACE CURVE (km1 onwards, dashed orange) ──
+  const tPts=CDISTS.map((_,i)=>i<RIEGEL_START?null:`${xOfIdx(i).toFixed(1)},${yOf(tPaces[i]).toFixed(1)}`).filter(Boolean).join(' ');
+  h+=`<polyline points="${tPts}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-dasharray="10 5" stroke-linecap="round"/>`;
+  CDISTS.forEach((d,i)=>{
+    if(i<RIEGEL_START)return;
+    const x=xOfIdx(i),y=yOf(tPaces[i]);
+    h+=`<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4.5" fill="#f97316" stroke="#09090b" stroke-width="1.5"/>`;
+    h+=`<text x="${x.toFixed(1)}" y="${(y-8).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(249,115,22,.8)">${fmt(tPaces[i])}</text>`;
+  });
+
+  // ── HOVER ZONES (km1 onwards) ──
+  CDISTS.forEach((d,i)=>{
+    if(i<RIEGEL_START)return;
+    const x1=(xOfIdx(i-1)+xOfIdx(i))/2;
+    const x2=i===CN-1?cW:(xOfIdx(i)+xOfIdx(i+1))/2;
+    h+=`<rect class="hz" data-i="${i}" x="${x1.toFixed(1)}" y="${PT}" width="${(x2-x1).toFixed(1)}" height="${cH}" fill="transparent" style="cursor:crosshair"/>`;
+  });
+
+  svg.innerHTML=h;svg.setAttribute('height',H);
+  svg.querySelectorAll('.hz').forEach(el=>{
+    el.addEventListener('mouseenter',e=>showTT(e,+el.dataset.i));
+    el.addEventListener('mousemove',moveTT);
+    el.addEventListener('mouseleave',hideTT);
+  });
+  svg.addEventListener('mouseleave',hideTT);
+}
+
+function showTT(e,i){
+  const d=CDISTS[i],tp=rAtD(d);
+  document.getElementById('cttD').textContent=`${CLBLS[i]} km`;
+  document.getElementById('cttT').textContent=`Target: ${fmt(tp)}/km  ·  ${fmtTot(tp,d)}`;
+  const fit=getFit();
+  if(fit){const cp=rFrom(fit.tot,fit.dist,d);document.getElementById('cttC').textContent=`Current: ${fmt(cp)}/km  ·  ${fmtTot(cp,d)}`;document.getElementById('cttC').style.display='block';}
+  else document.getElementById('cttC').style.display='none';
+  document.getElementById('ctt').style.opacity='1';moveTT(e);
+}
+function moveTT(e){
+  const tt=document.getElementById('ctt'),r=document.getElementById('chartOuter').getBoundingClientRect();
+  let x=e.clientX-r.left+16,y=e.clientY-r.top-12;
+  if(x+230>r.width)x=e.clientX-r.left-tt.offsetWidth-14;
+  if(y<0)y=4;
+  tt.style.left=x+'px';tt.style.top=y+'px';
+}
+function hideTT(){document.getElementById('ctt').style.opacity='0';}
+
+// ─── WEEK OVERLAY ────────────────────────────
+function drawOverlay(wIdx,xOfIdx,yOf,easyP,cW,cH,PT){
+  const tp=weeks-3;
+  const prog=clamp(wIdx/Math.max(tp-1,1),0,1);
+  const intP  = wIntPace(wIdx);
+  const tmpP  = wTmpPace(wIdx);
+  const longP = wLongPace(wIdx);
+  const lkm   = getLongKm(wIdx,weeks);
+  const mpfrac= getMPFrac(wIdx,weeks);
+  const mpkm  = Math.round(lkm*mpfrac*10)/10;
+
+  // Zone pixel boundaries (by index)
+  const zIL=xOfIdx(1),zIR=xOfIdx(3); // interval zone: idx 1-3 (km 1-5)
+  const zTL=xOfIdx(3),zTR=xOfIdx(5); // tempo zone: idx 3-5 (km 5-15)
+  const zLL=xOfIdx(5),zLR=xOfIdx(8); // long zone: idx 5-8 (km 15-42.2)
+  const zIW=zIR-zIL, zTW=zTR-zTL, zLW=zLR-zLL;
+
+  let h='';
+
+  // Zone background tints
+  h+=`<rect x="${zIL.toFixed(1)}" y="${PT}" width="${zIW.toFixed(1)}" height="${cH}" fill="rgba(250,204,21,0.025)"/>`;
+  h+=`<rect x="${zTL.toFixed(1)}" y="${PT}" width="${zTW.toFixed(1)}" height="${cH}" fill="rgba(239,68,68,0.025)"/>`;
+  h+=`<rect x="${zLL.toFixed(1)}" y="${PT}" width="${zLW.toFixed(1)}" height="${cH}" fill="rgba(52,211,153,0.025)"/>`;
+
+  // Zone labels (top, faint)
+  h+=`<text x="${((zIL+zIR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(250,204,21,0.35)" letter-spacing="1">INTERVAL</text>`;
+  h+=`<text x="${((zTL+zTR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(239,68,68,0.35)" letter-spacing="1">TEMPO</text>`;
+  h+=`<text x="${((zLL+zLR)/2).toFixed(1)}" y="${(PT-3).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="7" fill="rgba(52,211,153,0.35)" letter-spacing="1">LONG RUN</text>`;
+
+  // ── INTERVAL: VVV ──
+  // In inverted chart: interval (fast) → small y → appears near TOP ✓
+  const iWarm=zIW*0.15, iCool=zIW*0.10;
+  const IREPS=4;
+  const repBlock=(zIW-iWarm-iCool)/IREPS;
+  const repDown=repBlock*0.45, repUp=repBlock*0.45, repRec=repBlock*0.10;
+  let iPts=[], ix=zIL;
+  iPts.push([ix,easyP]); ix+=iWarm; iPts.push([ix,easyP]);
+  for(let r=0;r<IREPS;r++){
+    iPts.push([ix,easyP]);
+    iPts.push([ix+repDown,intP]);        // V tip at this week's interval pace (fast → high on chart)
+    iPts.push([ix+repDown+repUp,easyP]);
+    ix+=repDown+repUp+repRec;
+    if(r<IREPS-1)iPts.push([ix,easyP]);
+  }
+  iPts.push([ix,easyP]); ix+=iCool; iPts.push([ix,easyP]);
+  h+=`<polyline points="${iPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(250,204,21,0.85)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const iVtipX=iPts[2][0]+repDown;
+  // In inverted chart: interval pace is fast → small y → tip points UP
+  h+=`<text x="${iVtipX.toFixed(1)}" y="${(yOf(intP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(250,204,21,.9)">${fmt(intP)}/km</text>`;
+
+  // ── TEMPO: ⎽|‾|⎽ multi-block ──
+  // Tempo (faster than easy) → smaller y → plateaus appear ABOVE easy baseline
+  const TREPS=Math.round(2+prog*2);
+  const tWarm=zTW*0.12, tCool=zTW*0.10;
+  const tAvail=zTW-tWarm-tCool;
+  const tRep=tAvail/(TREPS*1.8); // rep width
+  const tRec=tRep*0.8;
+  const tTotal2=TREPS*tRep+(TREPS-1)*tRec;
+  const tScale=tAvail/tTotal2;
+  const tRep2=tRep*tScale, tRec2=tRec*tScale;
+  let tPts=[], tx=zTL;
+  tPts.push([tx,easyP]); tx+=tWarm; tPts.push([tx,easyP]);
+  for(let r=0;r<TREPS;r++){
+    tPts.push([tx,easyP]);
+    tPts.push([tx,tmpP]);       // tempo pace faster → smaller y → bar goes UP
+    tx+=tRep2;
+    tPts.push([tx,tmpP]);
+    tPts.push([tx,easyP]);
+    if(r<TREPS-1){tx+=tRec2;tPts.push([tx,easyP]);}
+  }
+  tx+=tCool; tPts.push([tx,easyP]);
+  h+=`<polyline points="${tPts.map(([x,p])=>`${x.toFixed(1)},${yOf(p).toFixed(1)}`).join(' ')}" fill="none" stroke="rgba(239,68,68,0.8)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+  const tFirstMid=tPts[2][0]+(tRep2/2);
+  h+=`<text x="${tFirstMid.toFixed(1)}" y="${(yOf(tmpP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(239,68,68,.9)">${fmt(tmpP)}/km</text>`;
+
+  // ── LONG RUN ──
+  // Easy flat, then step UP (faster MP pace) for the MP section, endpoint dot
+  const MAX_LONG=34;
+  const lFrac=Math.min(lkm/MAX_LONG,1);
+  const lEndX=zLL+lFrac*zLW;
+  const mpStartFrac=mpkm>0?Math.min((lkm-mpkm)/MAX_LONG,1):lFrac;
+  const mpStartX=zLL+mpStartFrac*zLW;
+
+  if(mpkm>0){
+    // Long run pace (MP) is faster than easy → smaller y → step goes UP in chart
+    h+=`<polyline points="${zLL.toFixed(1)},${yOf(easyP).toFixed(1)} ${mpStartX.toFixed(1)},${yOf(easyP).toFixed(1)} ${mpStartX.toFixed(1)},${yOf(longP).toFixed(1)} ${lEndX.toFixed(1)},${yOf(longP).toFixed(1)}" fill="none" stroke="rgba(52,211,153,0.7)" stroke-width="2.5" stroke-linecap="square" stroke-linejoin="miter"/>`;
+    const mpMidX=(mpStartX+lEndX)/2;
+    h+=`<text x="${mpMidX.toFixed(1)}" y="${(yOf(longP)-6).toFixed(1)}" text-anchor="middle" font-family="DM Mono,monospace" font-size="8" fill="rgba(52,211,153,.8)">${fmt(longP)}/km</text>`;
+  } else {
+    h+=`<polyline points="${zLL.toFixed(1)},${yOf(easyP).toFixed(1)} ${lEndX.toFixed(1)},${yOf(easyP).toFixed(1)}" fill="none" stroke="rgba(52,211,153,0.7)" stroke-width="2.5" stroke-linecap="square"/>`;
+  }
+  const epY=yOf(mpkm>0?longP:easyP);
+  h+=`<circle cx="${lEndX.toFixed(1)}" cy="${epY.toFixed(1)}" r="7" fill="none" stroke="rgba(52,211,153,0.25)" stroke-width="1.5"/>`;
+  h+=`<circle cx="${lEndX.toFixed(1)}" cy="${epY.toFixed(1)}" r="4" fill="none" stroke="rgba(52,211,153,0.55)" stroke-width="1.5"/>`;
+  h+=`<circle cx="${lEndX.toFixed(1)}" cy="${epY.toFixed(1)}" r="2" fill="#34d399" opacity="0.9"/>`;
+  h+=`<text x="${(lEndX+9).toFixed(1)}" y="${(epY+4).toFixed(1)}" font-family="DM Mono,monospace" font-size="8" fill="rgba(52,211,153,.85)">${lkm}km</text>`;
+
+  return h;
+}
+
+// ─── PLAN ────────────────────────────────────
+const getLongKm=(w,tot)=>{
+  const tp=tot-3;if(w>=tp)return [24,18,12][w-tp]??12;
+  const rec=(w+1)%4===0&&w>0;
+  const pr=w/Math.max(tp-1,1),b=Math.round(10+22*Math.pow(pr,.72));
+  return rec?Math.max(10,Math.round(b*.78)):b;
+};
+const getMPFrac=(w,tot)=>{
+  const tp=tot-3,intro=Math.floor(tot*.44);
+  if(w<intro)return 0;if(w>=tp)return .45-((w-tp)/3)*.15;
+  return .05+((w-intro)/Math.max(tp-intro-1,1))*.42;
+};
+
+function buildPlan(){
+  const el=document.getElementById('plan');el.innerHTML='';
+  const tp=weeks-3,base=Math.floor(weeks*.44);
+  [{name:'BASE',f:0,t:base-1},{name:'BUILD',f:base,t:tp-1},{name:'TAPER',f:tp,t:weeks-1}].forEach(ph=>{
+    if(ph.f>ph.t)return;
+    const d=document.createElement('div');d.className='plbl';d.textContent=`— ${ph.name} PHASE`;el.appendChild(d);
+    for(let w=ph.f;w<=ph.t;w++)el.appendChild(mkWeek(w,(w+1)%4===0&&w>0&&w<tp,ph.name,(w-ph.f)*14));
+  });
+  const rd=document.createElement('div');rd.className='raceday';
+  rd.innerHTML=`<div class="rd-top"><div class="rdlbl">RACE<br>DAY</div><div><div class="rdbar"><div class="rdshine"></div></div><div class="rdinfo">42.2 KM @ ${fmt(mpSecs)}/km · TARGET ${fmtT(timeMins)}</div></div></div>`;
+  el.appendChild(rd);el.appendChild(buildSplits());
+}
+
+function mkWeek(wIdx,rec,phase,delay){
+  const row=document.createElement('div');row.className='wk';row.style.animationDelay=delay+'ms';
+  const lbl=document.createElement('div');lbl.className='wlbl'+(rec?' rec':'');
+  lbl.innerHTML=`<strong>W${wIdx+1}</strong>${rec?'<div class="rtag">RECOVERY</div>':''}`;
+  row.appendChild(lbl);
+  const content=document.createElement('div');content.className='wcontent';
+  const bars=document.createElement('div');bars.className='run-bars';
+  const lkm=getLongKm(wIdx,weeks),mpf=getMPFrac(wIdx,weeks),tp=weeks-3;
+  const ekm=rec?6:phase==='TAPER'?8:Math.min(12,7+Math.floor(wIdx/4));
+  bars.appendChild(mkBar('EASY',ekm,[{t:'easy',km:ekm}],lkm,null));
+  if(!(phase==='TAPER'&&wIdx>=tp+1)){
+    const wt=wTmpPace(wIdx),target=calcTP(),fit=getFit();
+    const startT=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
+    const pr2=clamp(1-(wt-target)/Math.max(startT-target,.001),0,1);
+    const tCol=`hsl(${Math.round(220-220*pr2)},80%,56%)`;
+    let rk=phase==='BASE'?(rec?.8:1.0):phase==='BUILD'?parseFloat((1+(wIdx/weeks)*1.5).toFixed(1)):1.0;
+    const reps=phase==='TAPER'?3:4;
+    const segs=[{t:'easy',km:1.5}];
+    for(let r=0;r<reps;r++){segs.push({t:'tempo',km:rk});if(r<reps-1)segs.push({t:'easy',km:.5});}
+    segs.push({t:'easy',km:1});
+    bars.appendChild(mkBar(`TEMPO ${reps}×${rk.toFixed(1)}K`,parseFloat((1.5+reps*rk+(reps-1)*.5+1).toFixed(1)),segs,lkm,tCol));
+  }
+  bars.appendChild(mkLongBar(lkm,mpf,phase));
+  content.appendChild(bars);
+  const target=calcTP(),fit=getFit(),startT=fit?rFrom(fit.tot,fit.dist,10):target*1.14;
+  const wt=wTmpPace(wIdx),trackMax=Math.max(startT,target*1.18),trackMin=target*0.98;
+  const pos=p=>clamp(1-(p-trackMin)/(trackMax-trackMin),0,1);
+  const dpct=(pos(wt)*100).toFixed(1),tpct=(pos(target)*100).toFixed(1);
+  const pr2=clamp(1-(wt-target)/Math.max(startT-target,.001),0,1);
+  const dc=`hsl(${Math.round(220-220*pr2)},80%,56%)`;
+  const conv=document.createElement('div');conv.className='conv-row';
+  conv.innerHTML=`<div class="cv-lbl">INTENSITY</div><div class="cv-out"><div class="cv-track"><div class="cv-fill" style="width:${dpct}%;background:linear-gradient(90deg,rgba(59,130,246,.2),${dc})"></div><div class="cv-tgt" style="left:${tpct}%"></div><div class="cv-dot" style="left:${dpct}%;background:${dc}"></div></div><div class="cv-ends"><span class="cv-end">SLOW</span><span class="cv-end">TARGET ▸</span></div></div><div class="cv-pace" style="color:${dc}">${fmt(wt)}</div>`;
+  content.appendChild(conv);row.appendChild(content);return row;
+}
+
+function mkLongBar(lkm,mpf,phase){
+  const mpkm=Math.round(lkm*mpf*10)/10,ekm=parseFloat((lkm-mpkm).toFixed(1)),segs=[];
+  if(mpkm<=0)segs.push({t:'easy',km:lkm});
+  else if(phase==='BUILD'){
+    const bl=Math.min(3,Math.ceil(mpkm/6)),em=parseFloat((mpkm/bl).toFixed(1)),ee=parseFloat((ekm/(bl+1)).toFixed(1));
+    segs.push({t:'easy',km:ee});
+    for(let b=0;b<bl;b++){segs.push({t:'marathon',km:em});if(b<bl-1)segs.push({t:'easy',km:ee});}
+    segs.push({t:'easy',km:ee});
+  } else if(phase==='BASE'){segs.push({t:'easy',km:ekm});if(mpkm>0)segs.push({t:'marathon',km:mpkm});}
+  else{const hf=parseFloat((ekm/2).toFixed(1));segs.push({t:'easy',km:hf});segs.push({t:'marathon',km:mpkm});segs.push({t:'easy',km:hf});}
+  return mkBar('LONG RUN',lkm,segs,lkm,null);
+}
+
+const MAX_REF=34;
+function mkBar(label,tot,segs,ref,tc){
+  const r=document.createElement('div');r.className='rrow';
+  const t=document.createElement('div');t.className='rtype';t.textContent=label;r.appendChild(t);
+  const wrap=document.createElement('div');wrap.className='bwrap';
+  const sw=document.createElement('div');sw.className='segs';sw.style.width=(Math.min(tot/MAX_REF,1)*100)+'%';
+  segs.forEach(s=>{
+    if(!s.km||s.km<=0)return;
+    const e=document.createElement('div');e.className=`seg ${s.t}`;e.style.width=(s.km/tot*100)+'%';
+    if(s.t==='tempo'&&tc)e.style.background=tc;sw.appendChild(e);
+  });
+  wrap.appendChild(sw);r.appendChild(wrap);
+  const d=document.createElement('div');d.className='rdist';d.textContent=tot+'km';r.appendChild(d);return r;
+}
+
+function buildSplits(){
+  const wrap=document.createElement('div');wrap.className='splits-wrap';
+  wrap.innerHTML=`<div class="stitle">RACE DAY SPLITS</div><div class="ssub">@ ${fmt(mpSecs)}/KM · FINISH ${fmtT(timeMins)}</div>`;
+  const tbl=document.createElement('table');tbl.className='st';
+  tbl.innerHTML=`<thead><tr><th>KM</th><th>ELAPSED</th><th>PACE</th><th class="sbarcell">PROGRESS</th></tr></thead>`;
+  const tb=document.createElement('tbody');
+  [5,10,15,20,25,30,35,40,42.2].forEach(km=>{
+    const el=mpSecs*km,pct=(km/MA*100).toFixed(1),last=km===42.2;
+    const tr=document.createElement('tr');if(last)tr.classList.add('hlrow');
+    tr.innerHTML=`<td><div class="skm">${km===42.2?'42.2':km}</div></td><td>${fmtE(el)}</td><td style="color:var(--mp)">${fmt(mpSecs)}/km</td><td class="sbarcell"><div class="sbarw"><div class="sbarf" style="width:${pct}%"></div></div><div class="spct">${pct}%</div></td>`;
+    tb.appendChild(tr);
+  });
+  tbl.appendChild(tb);wrap.appendChild(tbl);return wrap;
+}
+
+window.addEventListener('resize',drawChart);
+renderAll();
+</script>
+</body>
+</html>
